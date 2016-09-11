@@ -10,7 +10,7 @@ Add-Type -TypeDefinition @"
     }
 "@
 
-Function Write-Log
+Function Write-EZLog
 {
 <#
 .Synopsis
@@ -43,29 +43,29 @@ Function Write-Log
 .EXAMPLE
    First thing to do is write a header and define a log file where the data will be written.
 
-   PS > Write-Log -Header -LogFile C:\logs\mylogfile.log
+   PS > Write-EZLog -Header -LogFile C:\logs\mylogfile.log
    
    Next, anywhere in your script when you need to write a log, do one of the folowing command:
 
-   PS > Write-Log -Category INF -Message 'This is an info to be written in the log file'
-   PS > Write-Log -Category WAR -Message 'This is a warning to be written in the log file'
-   PS > Write-Log -Category ERR -Message 'This is an error to be written in the log file'
+   PS > Write-EZLog -Category INF -Message 'This is an info to be written in the log file'
+   PS > Write-EZLog -Category WAR -Message 'This is a warning to be written in the log file'
+   PS > Write-EZLog -Category ERR -Message 'This is an error to be written in the log file'
 
    Finaly, to close your logfile you need to write a footer, just do that:
 
-   PS > Write-Log -Footer
+   PS > Write-EZLog -Footer
 
 .EXAMPLE
    If you want to see the logs in the PowerShell console whereas they are still written to disk, 
    you can specify the -ToScreen switch.
    Info entries will be written in cyan color, Yellow for warnings, and Red for the errors.
 
-   PS > Write-Log -Category WAR -Message 'This is a warning to be written in the log file' -ToScreen
+   PS > Write-EZLog -Category WAR -Message 'This is a warning to be written in the log file' -ToScreen
 
 .NOTES
    AUTHOR: Arnaud PETITJEAN - arnaud@powershell-scripting.com
-   VERSION: 1.0.0
-   LASTEDIT: 2016/08/25
+   VERSION: 1.1.0
+   LASTEDIT: 2016/09/02
 
 #>
     [cmdletBinding(DefaultParameterSetName="set1", SupportsShouldProcess=$False)]
