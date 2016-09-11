@@ -1,2 +1,2 @@
 # EZLog
-A very easy and pragmatic log module for admins in a hurry.
+A very easy and pragmatic PowerShell log module for admins in a hurry.
