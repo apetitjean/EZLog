@@ -17,7 +17,7 @@ InModuleScope "EZLog" {
 
             It "Writes an information into the log file." {
                 Write-EZLog -Category INF -Message 'This is an info to be written in the log file'
-                Get-Content $logfile | Select-String -Pattern 'INF;' -Quiet | Should Be $false
+                Get-Content $logfile | Select-String -Pattern 'INF;' -Quiet | Should Be $true
             }
 
             It "Writes a warning into the log file." {
