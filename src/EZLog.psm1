@@ -64,7 +64,7 @@ Function Write-EZLog
 
 .NOTES
    AUTHOR: Arnaud PETITJEAN - arnaud@powershell-scripting.com
-   VERSION: 1.1.0
+   VERSION: 1.2.0
    LASTEDIT: 2016/09/02
 
 #>
@@ -96,7 +96,7 @@ Function Write-EZLog
     {
        "set1"
        {
-           $date = Get-Date -UFormat "%Y/%m/%d %H:%M:%S"
+           $date = Get-Date -UFormat "%Y-%m-%d %H:%M:%S"
            switch ($Category)
            {
                INF  { $Message = "$date; INF; $Message"; $Color = 'Cyan'   ; break }
@@ -115,7 +115,7 @@ Function Write-EZLog
           $currentScriptName = $myinvocation.ScriptName
           $currentUser = $ENV:USERDOMAIN + '\' + $ENV:USERNAME
           $currentComputer = $ENV:COMPUTERNAME
-          $StartDate_str = Get-Date -UFormat "%Y/%m/%d %H:%M:%S"
+          $StartDate_str = Get-Date -UFormat "%Y-%m-%d %H:%M:%S"
           $WmiInfos = Get-WmiObject win32_operatingsystem
           $OSName  = $WmiInfos.caption
           $OSSP    = $WmiInfos.csdversion
@@ -149,7 +149,7 @@ OS Architecture        : $OSArchi
           }
           $StartDate = [DateTime]$Matches.date
           $EndDate = Get-Date
-          $EndDate_str = Get-Date $EndDate -UFormat "%Y/%m/%d %H:%M:%S"
+          $EndDate_str = Get-Date $EndDate -UFormat "%Y-%m-%d %H:%M:%S"
 
           $duration_TotalSeconds = [int](New-TimeSpan -Start $StartDate -End $EndDate | Select-Object -ExpandProperty TotalSeconds)
           $duration_TotalMinutes = (New-TimeSpan -Start $StartDate -End $EndDate | Select-Object -ExpandProperty TotalMinutes)
