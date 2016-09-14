@@ -43,28 +43,28 @@ Function Write-EZLog
 .EXAMPLE
    First thing to do is write a header and define a log file where the data will be written.
 
-   PS > Write-EZLog -Header -LogFile C:\logs\mylogfile.log
+   Write-EZLog -Header -LogFile C:\logs\mylogfile.log
    
    Next, anywhere in your script when you need to write a log, do one of the folowing command:
 
-   PS > Write-EZLog -Category INF -Message 'This is an info to be written in the log file'
-   PS > Write-EZLog -Category WAR -Message 'This is a warning to be written in the log file'
-   PS > Write-EZLog -Category ERR -Message 'This is an error to be written in the log file'
+   Write-EZLog -Category INF -Message 'This is an info to be written in the log file'
+   Write-EZLog -Category WAR -Message 'This is a warning to be written in the log file'
+   Write-EZLog -Category ERR -Message 'This is an error to be written in the log file'
 
    Finaly, to close your logfile you need to write a footer, just do that:
 
-   PS > Write-EZLog -Footer
+   Write-EZLog -Footer
 
 .EXAMPLE
    If you want to see the logs in the PowerShell console whereas they are still written to disk, 
    you can specify the -ToScreen switch.
    Info entries will be written in cyan color, Yellow for warnings, and Red for the errors.
 
-   PS > Write-EZLog -Category WAR -Message 'This is a warning to be written in the log file' -ToScreen
+   Write-EZLog -Category WAR -Message 'This is a warning to be written in the log file' -ToScreen
 
 .NOTES
    AUTHOR: Arnaud PETITJEAN - arnaud@powershell-scripting.com
-   VERSION: 1.3.0
+   VERSION: 1.3.1
    LASTEDIT: 2016/09/14
 
 #>
