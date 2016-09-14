@@ -64,8 +64,8 @@ Function Write-EZLog
 
 .NOTES
    AUTHOR: Arnaud PETITJEAN - arnaud@powershell-scripting.com
-   VERSION: 1.2.0
-   LASTEDIT: 2016/09/02
+   VERSION: 1.3.0
+   LASTEDIT: 2016/09/14
 
 #>
     [cmdletBinding(DefaultParameterSetName="set1", SupportsShouldProcess=$False)]
@@ -105,7 +105,6 @@ Function Write-EZLog
            }
             
            Add-Content -Path $Global:LogFile -Value $Message
- 
            break
        }
          
@@ -113,27 +112,25 @@ Function Write-EZLog
        {
           New-Variable -Name LogFile -Value $LogFile -Option ReadOnly -Visibility Public -Scope Global -force
           $currentScriptName = $myinvocation.ScriptName
-          $currentUser = $ENV:USERDOMAIN + '\' + $ENV:USERNAME
-          $currentComputer = $ENV:COMPUTERNAME
-          $StartDate_str = Get-Date -UFormat "%Y-%m-%d %H:%M:%S"
-          $WmiInfos = Get-WmiObject win32_operatingsystem
-          $OSName  = $WmiInfos.caption
-          $OSSP    = $WmiInfos.csdversion
-          $OSArchi = $WmiInfos.OSArchitecture
-          $Message = @"
+          $currentUser       = $ENV:USERDOMAIN + '\' + $ENV:USERNAME
+          $currentComputer   = $ENV:COMPUTERNAME
+          $StartDate_str     = Get-Date -UFormat "%Y-%m-%d %H:%M:%S"
+          $WmiInfos          = Get-WmiObject win32_operatingsystem
+          $OSName            = $WmiInfos.caption
+          $OSSP              = $WmiInfos.csdversion
+          $OSArchi           = $WmiInfos.OSArchitecture
+          $Message           = @"
++----------------------------------------------------------------------------------------+
+Script fullname          : $currentScriptName
+When generated           : $StartDate_str
+Current user             : $currentUser
+Current computer         : $currentComputer
+Operating System         : $OSName $OSSP
+OS Architecture          : $OSArchi
 +----------------------------------------------------------------------------------------+
 
-Nom du script          : $currentScriptName
-Généré le              : $StartDate_str
-
-Utilisateur courant    : $currentUser
-Ordinateur  courant    : $currentComputer
-Système d'exploitation : $OSName $OSSP
-OS Architecture        : $OSArchi
-
-+----------------------------------------------------------------------------------------+
 "@
-          # Création du fichier de log
+          # Log file creation
           [VOID] (New-Item -ItemType File -Path $LogFile -Force)
           Add-Content -Path $LogFile -Value $Message
           break
@@ -141,29 +138,28 @@ OS Architecture        : $OSArchi
                   
        "set3"
        {
-          # Analyse de l'entête du fichier de log pour extraire la date de début et conversion de la chaine en type [DateTime]
-          [VOID]( (Get-Content $Global:logFile -TotalCount 4)[-1] -match '^Généré le\s*: (?<date>\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})$' )   # On ignore le résultat boolean car ce qui nous intéresse est stockés dans $Matches
+          # Extracting start date from the file header
+          [VOID]( (Get-Content $Global:logFile -TotalCount 3)[-1] -match '^When generated\s*: (?<date>\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})$' )
           if ($Matches.date -eq $null)
           {
-             throw "Impossible de récupérer la date de début d'exécution. Vérifiez que le fichier de log possède bien une entête de fichier."
+             throw "Cannot get the start date from the header. Please check if the file header is correctly formatted."
           }
-          $StartDate = [DateTime]$Matches.date
-          $EndDate = Get-Date
+          $StartDate   = [DateTime]$Matches.date
+          $EndDate     = Get-Date
           $EndDate_str = Get-Date $EndDate -UFormat "%Y-%m-%d %H:%M:%S"
 
           $duration_TotalSeconds = [int](New-TimeSpan -Start $StartDate -End $EndDate | Select-Object -ExpandProperty TotalSeconds)
           $duration_TotalMinutes = (New-TimeSpan -Start $StartDate -End $EndDate | Select-Object -ExpandProperty TotalMinutes)
           $duration_TotalMinutes = [MATH]::Round($duration_TotalMinutes, 2)
           $Message = @"
+
 +----------------------------------------------------------------------------------------+
-
-Fin: $EndDate_str
-Temps écoulé (en secondes): $duration_TotalSeconds
-Temps écoulé (en minutes ): $duration_TotalMinutes
-
+End time                 : $EndDate_str
+Total duration (seconds) : $duration_TotalSeconds
+Total duration (minutes) : $duration_TotalMinutes
 +----------------------------------------------------------------------------------------+
 "@
-          # Création du fichier de log
+          # Append the footer to the log file
           Add-Content -Path $Global:LogFile -Value $Message
           break
        }
