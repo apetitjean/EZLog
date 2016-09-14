@@ -142,7 +142,7 @@ OS Architecture        : $OSArchi
        "set3"
        {
           # Analyse de l'entête du fichier de log pour extraire la date de début et conversion de la chaine en type [DateTime]
-          [VOID]( (Get-Content $Global:logFile -TotalCount 4)[-1] -match '^Généré le\s*: (?<date>\d{4}/\d{2}/\d{2} \d{2}:\d{2}:\d{2})$' )   # On ignore le résultat boolean car ce qui nous intéresse est stockés dans $Matches
+          [VOID]( (Get-Content $Global:logFile -TotalCount 4)[-1] -match '^Généré le\s*: (?<date>\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})$' )   # On ignore le résultat boolean car ce qui nous intéresse est stockés dans $Matches
           if ($Matches.date -eq $null)
           {
              throw "Impossible de récupérer la date de début d'exécution. Vérifiez que le fichier de log possède bien une entête de fichier."
