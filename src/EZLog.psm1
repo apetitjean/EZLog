@@ -64,8 +64,8 @@ Function Write-EZLog
 
 .NOTES
    AUTHOR: Arnaud PETITJEAN - arnaud@powershell-scripting.com
-   VERSION: 1.3.1
-   LASTEDIT: 2016/09/14
+   VERSION: 1.3.2
+   LASTEDIT: 2016/09/21
 
 #>
     [cmdletBinding(DefaultParameterSetName="set1", SupportsShouldProcess=$False)]
@@ -99,7 +99,7 @@ Function Write-EZLog
            $date = Get-Date -UFormat "%Y-%m-%d %H:%M:%S"
            switch ($Category)
            {
-               INF  { $Message = "$date; INF; $Message"; $Color = 'Cyan'   ; break }
+               INF  { $Message = "$date; AAA; $Message"; $Color = 'Cyan'   ; break }
                WAR  { $Message = "$date; WAR; $Message"; $Color = 'Yellow' ; break }
                ERR  { $Message = "$date; ERR; $Message"; $Color = 'Red'    ; break }
            }
