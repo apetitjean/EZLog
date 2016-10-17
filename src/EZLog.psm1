@@ -117,7 +117,6 @@ Function Write-EZLog
           $StartDate_str     = Get-Date -UFormat "%Y-%m-%d %H:%M:%S"
           $WmiInfos          = Get-WmiObject win32_operatingsystem
           $OSName            = $WmiInfos.caption
-          $OSSP              = $WmiInfos.csdversion
           $OSArchi           = $WmiInfos.OSArchitecture
           $Message           = @"
 +----------------------------------------------------------------------------------------+
@@ -125,7 +124,7 @@ Script fullname          : $currentScriptName
 When generated           : $StartDate_str
 Current user             : $currentUser
 Current computer         : $currentComputer
-Operating System         : $OSName $OSSP
+Operating System         : $OSName
 OS Architecture          : $OSArchi
 +----------------------------------------------------------------------------------------+
 
@@ -169,4 +168,132 @@ Total duration (minutes) : $duration_TotalMinutes
    {
        Write-Host $Message -ForegroundColor $Color
    }
+}
+
+Function Get-Log
+{
+    Param ($file)
+    
+    $content = Get-Content -Path $file
+    $index = 0
+    $sepPos = @()
+    foreach ($line in $content)
+    {
+        if ($line -like '+-*-+')
+        {
+            $sepPos += $index
+        }
+        $index++
+    }
+    
+    $result = (Get-Content $file)[(($SepPos[1])+1)..(($SepPos[2])-1)]
+    $result -ne '' # Blank lines exclusion
+}
+
+
+Function ConvertFrom-EZlog
+{
+    Param ( 
+       [parameter(Mandatory=$true, ValueFromPipeline=$true, position=0)]
+       [Alias("Path")]
+       [string]$FilePath
+
+     #  [parameter(Mandatory=$false, ValueFromPipeline=$false)]
+     #  [switch]$ToJson
+    )
+
+    begin
+    {
+        
+    }
+
+    process
+    {
+        $result = @{
+            Header = @{  ScriptFullname   = ''
+                         WhenGenerated    = ''
+                         CurrentUser      = ''
+                         CurrentComputer  = ''
+                         OperatingSystem  = ''
+                         OSArchitecture   = ''
+                    }
+            Events = @()
+            Footer = @{  EndTime          = ''
+                         TimeSpan         = ''
+            }
+        }
+
+        $header = Get-Content -Path $FilePath | Select-Object -Skip 1  -First 6
+        
+        $result.Header.ScriptFullname  = $( $null = $header[0] -match '(?<Name>.+?)(:\s{1})(?<Value>.+)?' 
+                                            if ( $matches ) 
+                                            {
+                                               $matches.Value   
+                                            }
+                                          )
+        $result.Header.WhenGenerated   = $( $null = $header[1] -match '(?<Name>.+?)(:\s{1})(?<Value>.+)?'
+                                            if ( $matches ) 
+                                            {
+                                               [DateTime]($matches.Value)
+                                            }
+                                          )
+        
+        $result.Header.CurrentUser     = $( $null = $header[2] -match '(?<Name>.+?)(:\s{1})(?<Value>.+)?'
+                                            if ( $matches ) 
+                                            {
+                                               $matches.Value
+                                            }
+                                          )
+
+        $result.Header.CurrentComputer  = $( $null = $header[3] -match '(?<Name>.+?)(:\s{1})(?<Value>.+)?'
+                                            if ( $matches ) 
+                                            {
+                                               $matches.Value
+                                            }
+                                          )
+                                                  
+        $result.Header.OperatingSystem = $( $null = $header[4] -match '(?<Name>.+?)(:\s{1})(?<Value>.+)?'
+                                            if ($matches) 
+                                            {
+                                               $matches.Value
+                                            }
+                                          )
+        $result.Header.OSArchitecture  = $( $null = $header[5] -match '(?<Name>.+?)(:\s{1})(?<Value>.+)?'
+                                            if ($matches) 
+                                            {
+                                               $matches.Value
+                                            }
+                                          )
+    
+        $footer = Get-Content -Path $FilePath | Select-Object -Skip 1  -Last 3
+        $result.Footer.EndTime         = $( $null = $footer[0] -match '(?<Name>.+?)(:\s{1})(?<Value>.+)?'
+                                            if ($matches) 
+                                            {
+                                               [DateTime]($matches.Value)
+                                            }
+                                          )
+
+        $result.Footer.TimeSpan        = New-TimeSpan -Start $result.Header.WhenGenerated -End $result.Footer.EndTime
+
+
+
+        $LogMessages = Get-Log -file $FilePath  
+        foreach ($log in $LogMessages)
+        {
+            $res = $log -split ';'
+            $result.Events += [PSCustomObject]@{
+                                    Date     = $res[0]
+                                    Category = $res[1]
+                                    Message  = $res[2]
+                                }
+        }
+ 
+
+
+    }
+
+    end
+    {
+        $result
+    }
 }
