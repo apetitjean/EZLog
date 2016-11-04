@@ -115,9 +115,17 @@ Function Write-EZLog
           $currentUser       = $ENV:USERDOMAIN + '\' + $ENV:USERNAME
           $currentComputer   = $ENV:COMPUTERNAME
           $StartDate_str     = Get-Date -UFormat "%Y-%m-%d %H:%M:%S"
-          $WmiInfos          = Get-WmiObject win32_operatingsystem
-          $OSName            = $WmiInfos.caption
-          $OSArchi           = $WmiInfos.OSArchitecture
+
+          if (Get-Command Get-WmiObject -ErrorAction SilentlyContinue) {
+            $WmiInfos        = Get-WmiObject win32_operatingsystem
+            $OSName          = $WmiInfos.caption
+            $OSArchi         = $WmiInfos.OSArchitecture
+          } elseif (Get-Command uname -ErrorAction SilentlyContinue) {
+            $OSName        = uname -s
+            $OSArchi       = uname -m
+          } else {
+            $OSName        = $OSArchi = 'Unknown'
+          }
           $Message           = @"
 +----------------------------------------------------------------------------------------+
 Script fullname          : $currentScriptName
