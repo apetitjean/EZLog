@@ -1,12 +1,10 @@
-Get-Module EZLog | Remove-Module
-
-Import-Module EZLog
+Import-Module -Force (Join-Path $PSScriptRoot EZLog.psd1)
 
 InModuleScope "EZLog" {
 
     Describe "Write-EZLog" {
 
-        $logfile = "TestDrive:\pester.log"
+        $logfile = Join-Path $TestDrive pester.log
 
         Context "Example 1" {
 
