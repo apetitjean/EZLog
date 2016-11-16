@@ -14,7 +14,7 @@ Function Write-EZLog
 {
 <#
 .SYNOPSIS
-   Utility cmdlet to write logs to disk in an easy and pragmatic way.
+   Utility cmdlet to write logs to disk in an easy and pragmatic way. 
 
 .DESCRIPTION
    This cmdlet allows to write timestamped and nice formatted logs with a header and footer. 
