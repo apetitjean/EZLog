@@ -133,6 +133,7 @@ Current user             : $currentUser
 Current computer         : $currentComputer
 Operating System         : $OSName
 OS Architecture          : $OSArchi
+Timezone                 : $([system.timezoneinfo]::Local.displayname)
 +----------------------------------------------------------------------------------------+
 
 "@
