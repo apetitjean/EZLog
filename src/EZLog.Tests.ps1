@@ -8,6 +8,40 @@ InModuleScope "EZLog" {
             $logfile = Join-Path $TestDrive pester.log
 
             It "Creates a log file with a header in it." {
+                Write-EZLog -Header -LogFile $logfile -Delimiter ','
+                Test-Path $logfile | Should Be $true
+            }
+
+            It "Test if the header was written correctly" {
+                $r = Select-String -Path $logfile -Pattern '^\+\-*\+$'
+                $r.count | Should Be 2            
+            }
+
+            It "Writes an information into the log file." {
+                Write-EZLog -Category INF -Message 'This is an info to be written in the log file'
+                Get-Content $logfile | Select-String -Pattern 'INF,' -Quiet | Should Be $true
+            }
+
+            It "Writes a warning into the log file." {
+                Write-EZLog -Category WAR -Message 'This is a warning to be written in the log file'
+                Get-Content $logfile | Select-String -Pattern 'WAR,' -Quiet | Should Be $true
+            }
+            
+            It "Writes an error into the log file." {
+                Write-EZLog -Category ERR -Message 'This is an error to be written in the log file'
+                Get-Content $logfile | Select-String -Pattern 'ERR,' -Quiet | Should Be $true
+            }
+
+            It "Writes the footer into the log file." {
+                Write-EZLog -Footer
+                Get-Content $logfile -Tail 1 | Should BeLike '+-*-+'
+            }
+        } # Context "Using separator ','"
+
+        Context "WriteEZLog with ';' separator" {
+            $logfile = Join-Path $TestDrive pester.log
+
+            It "Creates a log file with a header in it." {
                 Write-EZLog -Header -LogFile $logfile 
                 Test-Path $logfile | Should Be $true
             }
@@ -36,35 +70,6 @@ InModuleScope "EZLog" {
                 Write-EZLog -Footer
                 Get-Content $logfile -Tail 1 | Should BeLike '+-*-+'
             }
-        } # Context "Using separator ','"
-
-        Context "WriteEZLog with ';' separator" {
-            $logfile = Join-Path $TestDrive pester.log
-
-            It "Creates a log file with a header in it." {
-                Write-EZLog -Header -LogFile $logfile 
-                Test-Path $logfile | Should Be $true
-            }
-
-            It "Test if the header was written correctly" {
-                $r = Select-String -Path $logfile -Pattern '^\+\-*\+$'
-                $r.count | Should Be 2            
-            }
-
-            It "Writes a warning into the log file." {
-                Write-EZLog -Category WAR -Message 'This is a warning to be written in the log file'
-                Get-Content $logfile | Select-String -Pattern 'WAR;' -Quiet | Should Be $true
-            }
-            
-            It "Writes an error into the log file." {
-                Write-EZLog -Category ERR -Message 'This is an error to be written in the log file'
-                Get-Content $logfile | Select-String -Pattern 'ERR;' -Quiet | Should Be $true
-            }
-
-            It "Writes the footer into the log file." {
-                Write-EZLog -Footer
-                Get-Content $logfile -Tail 1 | Should BeLike '+-*-+'
-            }
         } # Context "Using separator ';'"
 
 
@@ -72,7 +77,7 @@ InModuleScope "EZLog" {
             $logfile = Join-Path $TestDrive pester.log
 
             It "Creates a log file with a header in it." {
-                Write-EZLog -Header -LogFile $logfile 
+                Write-EZLog -Header -LogFile $logfile -Delimiter "`t"
                 Test-Path $logfile | Should Be $true
             }
 
@@ -81,14 +86,19 @@ InModuleScope "EZLog" {
                 $r.count | Should Be 2            
             }
 
+            It "Writes an information into the log file." {
+                Write-EZLog -Category INF -Message 'This is an info to be written in the log file'
+                Get-Content $logfile | Select-String -Pattern "INF`t" -Quiet | Should Be $true
+            }
+
             It "Writes a warning into the log file." {
                 Write-EZLog -Category WAR -Message 'This is a warning to be written in the log file'
-                Get-Content $logfile | Select-String -Pattern 'WAR' -Quiet | Should Be $true
+                Get-Content $logfile | Select-String -Pattern "WAR`t" -Quiet | Should Be $true
             }
             
             It "Writes an error into the log file." {
                 Write-EZLog -Category ERR -Message 'This is an error to be written in the log file'
-                Get-Content $logfile | Select-String -Pattern 'ERR' -Quiet | Should Be $true
+                Get-Content $logfile | Select-String -Pattern "ERR`t" -Quiet | Should Be $true
             }
 
             It "Writes the footer into the log file." {
