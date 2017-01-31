@@ -84,7 +84,10 @@ Function Write-EZLog
 
         [parameter(Mandatory=$true, ParameterSetName="set2", ValueFromPipeline=$false)]
         [String]$LogFile,
-       
+
+        [parameter(Mandatory=$false, ParameterSetName="set2", ValueFromPipeline=$false)]
+        [Char]$Delimiter = $( if ((Get-Culture).TextInfo.ListSeparator -eq ' ')  {','} else {(Get-Culture).TextInfo.ListSeparator}), 
+
         [parameter(Mandatory=$false, ValueFromPipeline=$false)]
         [Switch]$ToScreen=$false
     )
@@ -96,20 +99,23 @@ Function Write-EZLog
        "set1"
        {
            $date = Get-Date -UFormat "%Y-%m-%d %H:%M:%S"
+           $Delimiter = $Global:Delimiter
            switch ($Category)
            {
-               INF  { $Message = "$date; INF; $Message"; $Color = 'Cyan'   ; break }
-               WAR  { $Message = "$date; WAR; $Message"; $Color = 'Yellow' ; break }
-               ERR  { $Message = "$date; ERR; $Message"; $Color = 'Red'    ; break }
+               INF  { $Message = ("$date{0} INF{0} $Message" -f $Global:EZLogDelimiter); $Color = 'Cyan'   ; break }
+               WAR  { $Message = ("$date{0} WAR{0} $Message" -f $Global:EZLogDelimiter); $Color = 'Yellow' ; break }
+               ERR  { $Message = ("$date{0} ERR{0} $Message" -f $Global:EZLogDelimiter); $Color = 'Red'    ; break }
            }
             
-           Add-Content -Path $Global:LogFile -Value $Message
+           Add-Content -Path $Global:EZLogFile -Value $Message
            break
        }
          
        "set2"
        {
-          New-Variable -Name LogFile -Value $LogFile -Option ReadOnly -Visibility Public -Scope Global -force
+          New-Variable -Name EZLogFile -Value $LogFile -Option ReadOnly -Visibility Public -Scope Global -force
+          New-Variable -Name EZLogDelimiter -Value $Delimiter -Option ReadOnly -Visibility Public -Scope Global -force
+
           $currentScriptName = $myinvocation.ScriptName
           $currentUser       = $ENV:USERDOMAIN + '\' + $ENV:USERNAME
           $currentComputer   = $ENV:COMPUTERNAME
@@ -137,15 +143,15 @@ OS Architecture          : $OSArchi
 
 "@
           # Log file creation
-          [VOID] (New-Item -ItemType File -Path $LogFile -Force)
-          Add-Content -Path $LogFile -Value $Message
+          [VOID] (New-Item -ItemType File -Path $Global:EZLogFile -Force)
+          Add-Content -Path $Global:EZLogFile -Value $Message
           break
        }
                   
        "set3"
        {
           # Extracting start date from the file header
-          [VOID]( (Get-Content $Global:logFile -TotalCount 3)[-1] -match '^When generated\s*: (?<date>\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})$' )
+          [VOID]( (Get-Content $Global:EZLogFile -TotalCount 3)[-1] -match '^When generated\s*: (?<date>\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})$' )
           if ($Matches.date -eq $null)
           {
              throw "Cannot get the start date from the header. Please check if the file header is correctly formatted."
@@ -166,7 +172,7 @@ Total duration (minutes) : $duration_TotalMinutes
 +----------------------------------------------------------------------------------------+
 "@
           # Append the footer to the log file
-          Add-Content -Path $Global:LogFile -Value $Message
+          Add-Content -Path $Global:EZLogFile -Value $Message
           break
        }
    } # End switch

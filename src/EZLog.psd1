@@ -12,7 +12,7 @@
 RootModule = 'EZLog.psm1'
 
 # Version number of this module.
-ModuleVersion = '1.5.1'
+ModuleVersion = '1.6.0'
 
 # ID used to uniquely identify this module
 GUID = '9f9d9559-2f69-4e46-83c8-c7ab739e745b'
