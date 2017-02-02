@@ -42,7 +42,7 @@ InModuleScope "EZLog" {
             $logfile = Join-Path $TestDrive pester.log
 
             It "Creates a log file with a header in it." {
-                Write-EZLog -Header -LogFile $logfile 
+                Write-EZLog -Header -LogFile $logfile -Delimiter ';'
                 Test-Path $logfile | Should Be $true
             }
 
