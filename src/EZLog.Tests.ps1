@@ -111,7 +111,7 @@ InModuleScope "EZLog" {
         Context "ConvertFrom-EZLog" {
             $logfile = Join-Path $TestDrive pester.log
 
-            Write-EZLog -Header -LogFile $logfile -Delimiter ';'
+            Write-EZLog -Header -LogFile $logfile -Delimiter ','
             Write-EZLog -Category INF -Message 'This is an info to be written in the log file'
             Write-EZLog -Category WAR -Message 'This is a warning to be written in the log file'
             Write-EZLog -Category ERR -Message 'This is an error to be written in the log file'

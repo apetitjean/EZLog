@@ -320,13 +320,14 @@ Function ConvertFrom-EZlog
 
 
         $LogMessages = Get-Log -file $FilePath  
+        $separator   = $LogMessages[0][19]
         foreach ($log in $LogMessages)
         {
-            $res = $log -split ';'
+            $res = $log -split $separator
             $result.Events += [PSCustomObject]@{
-                                    Date     = $res[0]
-                                    Category = $res[1]
-                                    Message  = $res[2]
+                                    Date     = $res[0] -as [DateTime]
+                                    Category = $res[1].Trim()
+                                    Message  = $res[2].Trim()
                                 }
         }
     }
