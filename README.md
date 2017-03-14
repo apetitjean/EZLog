@@ -42,6 +42,9 @@ Total duration (minutes) : 0.15
 Along with writing logs to a text file, you can also - if you want to - display the logs in the console. 
 Each category of log event (Info, Warning, Error) has it's own color, so it's easy to distinguish errors or warnings among regular info messages.    
 
+This is how it can look like in the console if you add the -ToScreen switch:
+![ezlog_screenshot_01](https://cloud.githubusercontent.com/assets/10902523/23906931/d280dae8-08cf-11e7-868b-c0f737633e2a.png)
+
 EZLog does not provide all the bells and whistles NxLog can offer, but instead **EZLog** is **very efficient** and super **mega easy to use**.
 
 ---
