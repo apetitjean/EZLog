@@ -78,6 +78,15 @@ EZLog does not provide all the bells and whistles NxLog can offer, but instead *
    Write-EZLog -Category WAR -Message 'This is a warning to be written in the log file' -ToScreen
 ```
 
+### EXAMPLE 3
+   You can change the default delimiter (which is the one defined in the Regional Settings of Windows) by specifying the -Delimiter parameter explicity.
+
+```PowerShell
+   Write-EZLog -Header -LogFile C:\logs\mylogfile.log -Delimiter '`t'
+```   
+
+   In this example, we use the tab character.
+  
 ---
 ## Prerequisites
 
