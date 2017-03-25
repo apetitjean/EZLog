@@ -17,6 +17,11 @@ InModuleScope "EZLog" {
                 $r.count | Should Be 2            
             }
 
+            It "Test if there's a CR+LF at the end of the 1st header's line" {
+               $bytefile = Get-Content -Path $logfile -Encoding Byte
+               ($bytefile | ForEach-Object -Begin {$i=0} -Process {if ($_ -eq 10){$bytefile[$i-1]} ; $i++})[0] | Should Be 13
+            }
+
             It "Writes an information into the log file." {
                 Write-EZLog -Category INF -Message 'This is an info to be written in the log file'
                 Get-Content $logfile | Select-String -Pattern 'INF,' -Quiet | Should Be $true
