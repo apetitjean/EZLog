@@ -41,6 +41,7 @@ InModuleScope "EZLog" {
                 Write-EZLog -Footer
                 Get-Content $logfile -Tail 1 | Should BeLike '+-*-+'
             }
+            Copy-Item -Path $logfile -Destination $PSScriptRoot
         } # Context "Using separator ','"
 
         Context "WriteEZLog with ';' separator" {

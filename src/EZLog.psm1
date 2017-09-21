@@ -1,5 +1,6 @@
 #Requires -Version 2.0
 $ErrorActionPreference = 'Stop'
+Set-PSDebug -Strict
 
 Add-Type -TypeDefinition @"
     public enum MsgCategory
@@ -93,6 +94,28 @@ Function Write-EZLog
     )
    
     $Color = 'Cyan'
+
+    $currentScriptName = $myinvocation.ScriptName
+    $StartDate_str     = Get-Date -UFormat "%Y-%m-%d %H:%M:%S"
+
+    if (Get-Command Get-WmiObject -ErrorAction SilentlyContinue) {
+      $currentUser     = $ENV:USERDOMAIN + '\' + $ENV:USERNAME
+      $currentComputer = $ENV:COMPUTERNAME  
+      $WmiInfos        = Get-WmiObject win32_operatingsystem
+      $OSName          = $WmiInfos.caption
+      $OSArchi         = $WmiInfos.OSArchitecture
+      $StrTerminator     = "`r`n"
+    } elseif (Get-Command uname -ErrorAction SilentlyContinue) {
+      $currentUser     = $ENV:USER
+      $currentComputer = uname -n
+      $OSName          = uname -s
+      $OSArchi         = uname -m
+      $StrTerminator   = "`r"
+    } else {
+      $OSName        = $OSArchi = 'Unknown'
+      $StrTerminator   = "`r"
+    }
+    #New-Variable -Name $StrTerminator -Value "AA" -Option ReadOnly -Visibility Public -Scope Global -force
         
     Switch ($PsCmdlet.ParameterSetName)
     {
@@ -102,12 +125,12 @@ Function Write-EZLog
            $Delimiter = $Global:Delimiter
            switch ($Category)
            {
-               INF  { $Message = ("$date{0} INF{0} $Message" -f $Global:EZLogDelimiter); $Color = 'Cyan'   ; break }
-               WAR  { $Message = ("$date{0} WAR{0} $Message" -f $Global:EZLogDelimiter); $Color = 'Yellow' ; break }
-               ERR  { $Message = ("$date{0} ERR{0} $Message" -f $Global:EZLogDelimiter); $Color = 'Red'    ; break }
+               INF  { $Message = ("$date{0} INF{0} $Message{1}" -f $Global:EZLogDelimiter, $StrTerminator); $Color = 'Cyan'   ; break }
+               WAR  { $Message = ("$date{0} WAR{0} $Message{1}" -f $Global:EZLogDelimiter, $StrTerminator); $Color = 'Yellow' ; break }
+               ERR  { $Message = ("$date{0} ERR{0} $Message{1}" -f $Global:EZLogDelimiter, $StrTerminator); $Color = 'Red'    ; break }
            }
             
-           Add-Content -Path $Global:EZLogFile -Value $Message
+           Add-Content -Path $Global:EZLogFile -Value $Message -NoNewLine
            break
        }
          
@@ -115,36 +138,21 @@ Function Write-EZLog
        {
           New-Variable -Name EZLogFile -Value $LogFile -Option ReadOnly -Visibility Public -Scope Global -force
           New-Variable -Name EZLogDelimiter -Value $Delimiter -Option ReadOnly -Visibility Public -Scope Global -force
+          
+          $Message =  "+----------------------------------------------------------------------------------------+{0}"
+          $Message += "Script fullname          : $currentScriptName{0}"
+          $Message += "When generated           : $StartDate_str{0}"
+          $Message += "Current user             : $currentUser{0}"
+          $Message += "Current computer         : $currentComputer{0}"
+          $Message += "Operating System         : $OSName{0}"
+          $Message += "OS Architecture          : $OSArchi{0}"
+          $Message += "+----------------------------------------------------------------------------------------+{0}"
+          $Message += "{0}"
 
-          $currentScriptName = $myinvocation.ScriptName
-          $currentUser       = $ENV:USERDOMAIN + '\' + $ENV:USERNAME
-          $currentComputer   = $ENV:COMPUTERNAME
-          $StartDate_str     = Get-Date -UFormat "%Y-%m-%d %H:%M:%S"
-
-          if (Get-Command Get-WmiObject -ErrorAction SilentlyContinue) {
-            $WmiInfos        = Get-WmiObject win32_operatingsystem
-            $OSName          = $WmiInfos.caption
-            $OSArchi         = $WmiInfos.OSArchitecture
-          } elseif (Get-Command uname -ErrorAction SilentlyContinue) {
-            $OSName        = uname -s
-            $OSArchi       = uname -m
-          } else {
-            $OSName        = $OSArchi = 'Unknown'
-          }
-          $Message           = @"
-+----------------------------------------------------------------------------------------+
-Script fullname          : $currentScriptName
-When generated           : $StartDate_str
-Current user             : $currentUser
-Current computer         : $currentComputer
-Operating System         : $OSName
-OS Architecture          : $OSArchi
-+----------------------------------------------------------------------------------------+
-
-"@
+          $Message = $Message -f $StrTerminator
           # Log file creation
           [VOID] (New-Item -ItemType File -Path $Global:EZLogFile -Force)
-          Add-Content -Path $Global:EZLogFile -Value $Message
+          Add-Content -Path $Global:EZLogFile -Value $Message -NoNewLine
           break
        }
                   
@@ -163,16 +171,18 @@ OS Architecture          : $OSArchi
           $duration_TotalSeconds = [int](New-TimeSpan -Start $StartDate -End $EndDate | Select-Object -ExpandProperty TotalSeconds)
           $duration_TotalMinutes = (New-TimeSpan -Start $StartDate -End $EndDate | Select-Object -ExpandProperty TotalMinutes)
           $duration_TotalMinutes = [MATH]::Round($duration_TotalMinutes, 2)
-          $Message = @"
 
-+----------------------------------------------------------------------------------------+
-End time                 : $EndDate_str
-Total duration (seconds) : $duration_TotalSeconds
-Total duration (minutes) : $duration_TotalMinutes
-+----------------------------------------------------------------------------------------+
-"@
+          $Message = "{0}"
+          $Message += "+----------------------------------------------------------------------------------------+{0}"
+          $Message += "End time                 : $EndDate_str{0}"
+          $Message += "Total duration (seconds) : $duration_TotalSeconds{0}"
+          $Message += "Total duration (minutes) : $duration_TotalMinutes{0}"
+          $Message += "+----------------------------------------------------------------------------------------+{0}"
+          
+          $Message = $Message -f $StrTerminator
+          #$host.EnterNestedPrompt()
           # Append the footer to the log file
-          Add-Content -Path $Global:EZLogFile -Value $Message
+          Add-Content -Path $Global:EZLogFile -Value $Message -NoNewLine
           break
        }
    } # End switch
