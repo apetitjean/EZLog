@@ -90,4 +90,5 @@ EZLog does not provide all the bells and whistles NxLog can offer, but instead *
 ---
 ## Prerequisites
 
-Windows PowerShell v2+
+Windows PowerShell v2+  
+Well formated Brain.
