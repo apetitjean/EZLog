@@ -1,4 +1,4 @@
-#Requires -Version 2.0
+#Requires -Version 5.0
 $ErrorActionPreference = 'Stop'
 Set-PSDebug -Strict
 
@@ -8,6 +8,14 @@ Add-Type -TypeDefinition @"
        INF   = 0,
        WAR   = 1,
        ERR   = 2
+    }
+
+    public enum Interval
+    {
+       Daily   = 0,
+       Weekly  = 1,
+       Monthly = 2,
+       Yearly  = 3
     }
 "@
 
@@ -65,28 +73,28 @@ Function Write-EZLog
 
 .NOTES
    AUTHOR: Arnaud PETITJEAN - arnaud@powershell-scripting.com
-   LASTEDIT: 2016/09/21
+   LASTEDIT: 2018/03/30
 
 #>
-    [cmdletBinding(DefaultParameterSetName="set1", SupportsShouldProcess=$False)]
+    [cmdletBinding(DefaultParameterSetName="set2", SupportsShouldProcess=$False)]
     PARAM (
-        [parameter(Mandatory=$true, ParameterSetName="set1", ValueFromPipeline=$false, position=0)]
+        [parameter(Mandatory=$true, ParameterSetName="set2", ValueFromPipeline=$false, position=0)]
         [MsgCategory]$Category,
        
-        [parameter(Mandatory=$true, ParameterSetName="set1", ValueFromPipeline=$false, position=1)]
+        [parameter(Mandatory=$true, ParameterSetName="set2", ValueFromPipeline=$false, position=1)]
         [Alias("Msg")]
         [String]$Message,
        
-        [parameter(Mandatory=$true, ParameterSetName="set2", ValueFromPipeline=$false)]
+        [parameter(Mandatory=$true, ParameterSetName="set1", ValueFromPipeline=$false)]
         [Switch]$Header,
        
         [parameter(Mandatory=$true, ParameterSetName="set3", ValueFromPipeline=$false)]
         [Switch]$Footer,
 
-        [parameter(Mandatory=$true, ParameterSetName="set2", ValueFromPipeline=$false)]
+        [parameter(Mandatory=$true, ValueFromPipeline=$false)]
         [String]$LogFile,
 
-        [parameter(Mandatory=$false, ParameterSetName="set2", ValueFromPipeline=$false)]
+        [parameter(Mandatory=$false, ValueFromPipeline=$false)]
         [Char]$Delimiter = $( if ((Get-Culture).TextInfo.ListSeparator -eq ' ')  {','} else {(Get-Culture).TextInfo.ListSeparator}), 
 
         [parameter(Mandatory=$false, ValueFromPipeline=$false)]
@@ -98,47 +106,26 @@ Function Write-EZLog
     $currentScriptName = $myinvocation.ScriptName
     $StartDate_str     = Get-Date -UFormat "%Y-%m-%d %H:%M:%S"
 
-    if (Get-Command Get-WmiObject -ErrorAction SilentlyContinue) {
-      $currentUser     = $ENV:USERDOMAIN + '\' + $ENV:USERNAME
-      $currentComputer = $ENV:COMPUTERNAME  
-      $WmiInfos        = Get-WmiObject win32_operatingsystem
-      $OSName          = $WmiInfos.caption
-      $OSArchi         = $WmiInfos.OSArchitecture
-      $StrTerminator     = "`r`n"
-    } elseif (Get-Command uname -ErrorAction SilentlyContinue) {
-      $currentUser     = $ENV:USER
-      $currentComputer = uname -n
-      $OSName          = uname -s
-      $OSArchi         = uname -m
-      $StrTerminator   = "`r"
-    } else {
-      $OSName        = $OSArchi = 'Unknown'
-      $StrTerminator   = "`r"
+    if ($isLinux -or $isMacOS) {
+        $currentUser     = $ENV:USER
+        $currentComputer = uname -n
+        $OSName          = uname -s
+        $OSArchi         = uname -m
+        $StrTerminator   = "`r"        
     }
-    #New-Variable -Name $StrTerminator -Value "AA" -Option ReadOnly -Visibility Public -Scope Global -force
-        
+    else {
+        $currentUser     = $ENV:USERDOMAIN + '\' + $ENV:USERNAME
+        $currentComputer = $ENV:COMPUTERNAME  
+        $WmiInfos        = Get-CimInstance win32_operatingsystem
+        $OSName          = $WmiInfos.caption
+        $OSArchi         = $WmiInfos.OSArchitecture
+        $StrTerminator     = "`r`n"       
+    }
+   
     Switch ($PsCmdlet.ParameterSetName)
     {
-       "set1"
+       "set1" # Header
        {
-           $date = Get-Date -UFormat "%Y-%m-%d %H:%M:%S"
-           $Delimiter = $Global:Delimiter
-           switch ($Category)
-           {
-               INF  { $Message = ("$date{0} INF{0} $Message{1}" -f $Global:EZLogDelimiter, $StrTerminator); $Color = 'Cyan'   ; break }
-               WAR  { $Message = ("$date{0} WAR{0} $Message{1}" -f $Global:EZLogDelimiter, $StrTerminator); $Color = 'Yellow' ; break }
-               ERR  { $Message = ("$date{0} ERR{0} $Message{1}" -f $Global:EZLogDelimiter, $StrTerminator); $Color = 'Red'    ; break }
-           }
-            
-           Add-Content -Path $Global:EZLogFile -Value $Message -NoNewLine
-           break
-       }
-         
-       "set2"
-       {
-          New-Variable -Name EZLogFile -Value $LogFile -Option ReadOnly -Visibility Public -Scope Global -force
-          New-Variable -Name EZLogDelimiter -Value $Delimiter -Option ReadOnly -Visibility Public -Scope Global -force
-          
           $Message =  "+----------------------------------------------------------------------------------------+{0}"
           $Message += "Script fullname          : $currentScriptName{0}"
           $Message += "When generated           : $StartDate_str{0}"
@@ -151,15 +138,29 @@ Function Write-EZLog
 
           $Message = $Message -f $StrTerminator
           # Log file creation
-          [VOID] (New-Item -ItemType File -Path $Global:EZLogFile -Force)
-          Add-Content -Path $Global:EZLogFile -Value $Message -NoNewLine
+          [VOID] (New-Item -ItemType File -Path $LogFile -Force)
+          Add-Content -Path $LogFile -Value $Message -NoNewline
           break
        }
+
+       "set2" # Body
+       {
+           $date = Get-Date -UFormat "%Y-%m-%d %H:%M:%S"
+           switch ($Category)
+           {
+               INF  { $Message = ("$date{0} INF{0} $Message{1}" -f $Delimiter, $StrTerminator); $Color = 'Cyan'   ; break }
+               WAR  { $Message = ("$date{0} WAR{0} $Message{1}" -f $Delimiter, $StrTerminator); $Color = 'Yellow' ; break }
+               ERR  { $Message = ("$date{0} ERR{0} $Message{1}" -f $Delimiter, $StrTerminator); $Color = 'Red'    ; break }
+           }
+            
+           Add-Content -Path $LogFile -Value $Message -NoNewLine
+           break
+       }
                   
-       "set3"
+       "set3" # Footer
        {
           # Extracting start date from the file header
-          [VOID]( (Get-Content $Global:EZLogFile -TotalCount 3)[-1] -match '^When generated\s*: (?<date>\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})$' )
+          [VOID]( (Get-Content $LogFile -TotalCount 3)[-1] -match '^When generated\s*: (?<date>\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})$' )
           if ($Matches.date -eq $null)
           {
              throw "Cannot get the start date from the header. Please check if the file header is correctly formatted."
@@ -180,9 +181,9 @@ Function Write-EZLog
           $Message += "+----------------------------------------------------------------------------------------+{0}"
           
           $Message = $Message -f $StrTerminator
-          #$host.EnterNestedPrompt()
+
           # Append the footer to the log file
-          Add-Content -Path $Global:EZLogFile -Value $Message -NoNewLine
+          Add-Content -Path $LogFile -Value $Message -NoNewLine
           break
        }
    } # End switch
@@ -271,7 +272,7 @@ Function ConvertFrom-EZlog
                     }
             Events = @()
             Footer = @{  EndTime          = ''
-                         TimeSpan         = ''
+                         Duration         = ''
             }
         }
 
@@ -325,7 +326,7 @@ Function ConvertFrom-EZlog
                                             }
                                           )
 
-        $result.Footer.TimeSpan        = New-TimeSpan -Start $result.Header.WhenGenerated -End $result.Footer.EndTime
+        $result.Footer.Duration        = New-TimeSpan -Start $result.Header.WhenGenerated -End $result.Footer.EndTime
 
 
 
@@ -346,4 +347,201 @@ Function ConvertFrom-EZlog
     {
         $result
     }
+}
+
+Function Invoke-EZLogRotation
+{
+<#
+.SYNOPSIS
+   Clean up old log files in order to keep only the most recent ones.
+
+.DESCRIPTION
+   Ancient logs files are either deleted or archived into a Zip file.
+
+   Options are available to specify how many newest files to keep. 
+   It's also possible to determine a time interval for the logs to keep (Daily, Weekly, Monthly)
+
+.PARAMETER Path
+    Directory containing the logs to rotate.
+
+.PARAMETER Filter
+    Pattern to identify the logs to rotate. Ex : *.log, *ezlog*.txt, etc.
+
+.PARAMETER Newest 
+    Specify how many files to keep in the directory. The files are sorted by the LastWriteTime attribute
+    and only the newest files determined by this parameter are kept. Other files are deleted or archived.
+
+.PARAMETER Interval
+    Specify the periodicy of the rotation.
+    Possible values are : Daily, Weekly, Monthly, Yearly
+
+    Daily   : Keep only the logs of the day
+    Weekly  : Keep only the logs of the week
+    Monthly : Keep only the logs of the month
+    Yearly  : Keep only the logs of the year
+
+.PARAMETER ArchiveTo
+    Indicate if the old logs need to be archived in a Zip before before deletion.
+
+    If not specified, old logs are deleted.
+
+    If specified, you must indicate a file path containing the .zip extension.
+    Eg. : C:\logs\archive.zip
+
+    If the archive file already exists, logs will be append to it. If you want to overwrite it you can use 
+    the -OverwriteArchive switch.
+
+.PARAMETER OverwriteArchive
+    Works in association with -ArchiveTo.
+    If specified, it overwrites an archive if it already exists.
+
+.EXAMPLE
+    Invoke-EZLogRotation -Path C:\LogFiles\*.log -Newest 15
+
+    Keep only the latest 15 newest *.log files in the C:\LogFiles directory. Older files will be deleted.
+
+.EXAMPLE
+    Invoke-EZLogRotation -Path C:\LogFiles\*.log -Newest 15 -ArchiveTo C:\LogFiles\archive.zip
+
+    Keep only the latest 15 newest *.log files in the C:\LogFiles directory. Before deletion, older files 
+    will be archived into the C:\LogFiles\archive.zip.
+    If the archive.zip file already exists, logs will be appended to it.
+
+.EXAMPLE
+    Invoke-EZLogRotation -Path C:\LogFiles\*.log -Newest 15 -ArchiveTo C:\LogFiles\archive.zip -OverwriteArchive
+
+    Keep only the latest 15 newest *.log files in the C:\LogFiles directory. Before deletion, older files 
+    will be archived into the C:\LogFiles\archive.zip.
+    If the archive.zip file already exists it will be overwritten.
+
+.EXAMPLE
+    Invoke-EZLogRotation -Path C:\LogFiles\*.log -Interval Daily 
+
+    Keep only the *.log files of the day in the C:\LogFiles directory. Older files will be deleted.
+    
+.EXAMPLE
+    Invoke-EZLogRotation -Path C:\LogFiles\*.log -Interval Weekly
+
+    Keep only the *.log files of the week in the C:\LogFiles directory. Older files will be deleted.
+
+.EXAMPLE
+    Invoke-EZLogRotation -Path C:\LogFiles\*.log -Interval Monthly
+
+    Keep only the *.log files of the month in the C:\LogFiles directory. Older files will be deleted.
+
+.EXAMPLE
+    Invoke-EZLogRotation -Path C:\LogFiles\*.log -Interval Monthly -ArchiveTo C:\LogFiles\archive.zip -Overwrite
+
+    Keep only the *.log files of the month in the C:\LogFiles directory. Older files will be archived monthly.
+
+.EXAMPLE
+    Invoke-EZLogRotation -Path C:\LogFiles\*.log -Interval Yearly 
+
+    Keep only the *.log files of the current year in the C:\LogFiles directory matching the pattern *.log. Older files will be deleted.
+
+.NOTES
+   AUTHOR: Arnaud PETITJEAN
+   LASTEDIT: 2018/03/01
+
+#>
+    [cmdletBinding(DefaultParameterSetName="", SupportsShouldProcess=$False)]
+    PARAM (
+        [parameter(Mandatory=$true, position=0)]
+        [String]$Path,
+       
+        [parameter(Mandatory=$true, position=1)]
+        [String]$Filter,
+
+        [parameter(Mandatory=$true, ParameterSetName="set1", ValueFromPipeline=$false)]
+        [Int]$Newest,
+
+        [parameter(Mandatory=$true, ParameterSetName="set2", ValueFromPipeline=$false, position=1)]
+        [Interval]$Interval,
+       
+        [parameter(Mandatory=$false)]
+        [ValidateScript({$_ -like '*.zip'})] 
+        [String]$ArchiveTo,
+        
+        [parameter(Mandatory=$false)]
+        [Switch]$OverwriteArchive
+    )
+
+    Switch ($PSCmdlet.ParameterSetName) {
+
+        'Set1' {
+            $filesToRemove = Get-ChildItem -Path $Path -Filter $Filter | Sort-Object -Property LastWriteTime -Descending | 
+                    Select-Object -Skip $Newest
+        }
+        
+        'Set2' {
+            Switch ($Interval) {
+                'Daily' { $filesToKeep =  Get-ChildItem -Path $Path -Filter $Filter | 
+                                             Where-Object { $_.LastWriteTime.Year  -eq (Get-Date).Year -and 
+                                                            $_.LastWriteTime.Month -eq (Get-Date).Month -and
+                                                            $_.LastWriteTime.Day   -eq (Get-Date).Day }
+                          $filesToRemove = Get-ChildItem "$Path\$Filter" -Exclude $filesToKeep
+                          Break
+                        }
+                'Weekly' { $filesToKeep =  Get-ChildItem -Path $Path -Filter $Filter | 
+                                             Where-Object { $_.LastWriteTime -ge (Get-FirstDayOfWeekDate) -and
+                                                            $_.LastWriteTime -le (Get-Date) }
+                          $filesToRemove = Get-ChildItem "$Path\$Filter" -Exclude $filesToKeep
+                          Break
+                        }
+                'Monthly' { $filesToKeep =  Get-ChildItem -Path $Path -Filter $Filter | 
+                                             Where-Object { $_.LastWriteTime -ge (Get-FirstDayOfMonthDate) -and
+                                                            $_.LastWriteTime -le (Get-Date) }
+                          $filesToRemove = Get-ChildItem "$Path\$Filter" -Exclude $filesToKeep
+                          Break
+                        }
+                'Yearly' { $filesToKeep =  Get-ChildItem -Path $Path -Filter $Filter | 
+                                             Where-Object { $_.LastWriteTime.Year -eq (Get-Date).Year }
+                          $filesToRemove = Get-ChildItem "$Path\$Filter" -Exclude $filesToKeep
+                          Break
+                        }                        
+            }
+        }
+    }
+
+    if ($ArchiveTo -and $OverwriteArchive) {
+        $filesToRemove | Compress-Archive -DestinationPath $ArchiveTo -CompressionLevel Optimal -Force
+    }
+    elseif ($ArchiveTo) {
+        $filesToRemove | Compress-Archive -DestinationPath $ArchiveTo -CompressionLevel Optimal -Update
+    }
+    
+    $filesToRemove | Remove-Item
+
+}
+
+Function Get-FirstDayOfWeek 
+{
+
+    (Get-Culture).DateTimeFormat.FirstDayOfWeek
+
+}
+
+Function Get-FirstDayOfWeekDate
+{
+    Param ( [Datetime]$date = (Get-Date) )
+
+    if ( ( (Get-FirstDayOfWeek) -eq [DayOfWeek]::Monday) -and ($date.DayOfWeek -eq [DayOfWeek]::Sunday) ) {
+        $nbJoursARetirer = 6 
+    } 
+    elseif ( ( (Get-FirstDayOfWeek) -eq [DayOfWeek]::Sunday) -and ($date.DayOfWeek -eq [DayOfWeek]::Sunday) ) {
+        $nbJoursARetirer = 0 
+    }
+    else {
+        $nbJoursARetirer = [int]$date.DayOfWeek - [int](Get-FirstDayOfWeek)
+    }
+
+    $date = $date.AddDays(-$nbJoursARetirer)
+    New-Object -TypeName datetime $date.Year, $date.Month, $date.Day, 0, 0, 0, 0
+}
+
+Function Get-FirstDayOfMonthDate
+{
+    Param ( [Datetime]$date = (Get-Date) )
+
+    New-Object -TypeName datetime $date.Year, $date.Month, 1, 0, 0, 0, 0
 }

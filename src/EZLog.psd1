@@ -12,7 +12,7 @@
 RootModule = 'EZLog.psm1'
 
 # Version number of this module.
-ModuleVersion = '1.6.3'
+ModuleVersion = '2.0.0'
 
 # ID used to uniquely identify this module
 GUID = '9f9d9559-2f69-4e46-83c8-c7ab739e745b'
@@ -24,13 +24,13 @@ Author = 'Arnaud PETITJEAN'
 CompanyName = 'PowerShell-Scripting.com'
 
 # Copyright statement for this module
-Copyright = '(c) 2017 Arnaud PETITJEAN. All rights reserved.'
+Copyright = '(c) 2018 Arnaud PETITJEAN. All rights reserved.'
 
 # Description of the functionality provided by this module
 Description = 'A very easy and pragmatic log module for admins in a hurry. See project site on Github for more info.'
 
 # Minimum version of the Windows PowerShell engine required by this module
-PowerShellVersion = '2.0'
+PowerShellVersion = '5.0'
 
 # Name of the Windows PowerShell host required by this module
 # PowerShellHostName = ''
@@ -39,7 +39,7 @@ PowerShellVersion = '2.0'
 # PowerShellHostVersion = ''
 
 # Minimum version of Microsoft .NET Framework required by this module
-DotNetFrameworkVersion = '2.0'
+#DotNetFrameworkVersion = '2.0'
 
 # Minimum version of the common language runtime (CLR) required by this module
 # CLRVersion = ''
@@ -66,13 +66,14 @@ DotNetFrameworkVersion = '2.0'
 # NestedModules = @()
 
 # Functions to export from this module
-FunctionsToExport = @('Write-EZLog','ConvertFrom-EZLog')
+FunctionsToExport = @('Write-EZLog','ConvertFrom-EZLog','Invoke-EZLogRotation')
+#FunctionsToExport = '*'
 
 # Cmdlets to export from this module
 CmdletsToExport = ''
 
 # Variables to export from this module
-VariablesToExport = 'logfile'
+VariablesToExport = ''
 
 # Aliases to export from this module
 AliasesToExport = ''
@@ -92,7 +93,7 @@ PrivateData = @{
     PSData = @{
 
         # Tags applied to this module. These help with module discovery in online galleries.
-        Tags = 'write-log', 'log', 'logging', 'easy', 'simple'
+        Tags = 'write-log', 'log', 'logging', 'easy', 'simple', 'rotation', 'rotate', 'logrotate'
 
         # A URL to the license for this module.
         # LicenseUri = ''
