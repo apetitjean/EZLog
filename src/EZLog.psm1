@@ -13,7 +13,6 @@ Add-Type -TypeDefinition @"
     public enum Interval
     {
        Daily   = 0,
-       Weekly  = 1,
        Monthly = 2,
        Yearly  = 3
     }
@@ -359,7 +358,7 @@ Function Invoke-EZLogRotation
    Ancient logs files are either deleted or archived into a Zip file.
 
    Options are available to specify how many newest files to keep. 
-   It's also possible to determine a time interval for the logs to keep (Daily, Weekly, Monthly)
+   It's also possible to determine a time interval for the logs to keep (daily, monthly, yearly)
 
 .PARAMETER Path
     Directory containing the logs to rotate.
@@ -373,10 +372,9 @@ Function Invoke-EZLogRotation
 
 .PARAMETER Interval
     Specify the periodicy of the rotation.
-    Possible values are : Daily, Weekly, Monthly, Yearly
+    Possible values are : Daily, Monthly, Yearly
 
     Daily   : Keep only the logs of the day
-    Weekly  : Keep only the logs of the week
     Monthly : Keep only the logs of the month
     Yearly  : Keep only the logs of the year
 
@@ -398,50 +396,45 @@ Function Invoke-EZLogRotation
 .EXAMPLE
     Invoke-EZLogRotation -Path C:\LogFiles\*.log -Newest 15
 
-    Keep only the latest 15 newest *.log files in the C:\LogFiles directory. Older files will be deleted.
+    Only keeps the latest 15 newest *.log files in the C:\LogFiles directory. Older files will be deleted.
 
 .EXAMPLE
     Invoke-EZLogRotation -Path C:\LogFiles\*.log -Newest 15 -ArchiveTo C:\LogFiles\archive.zip
 
-    Keep only the latest 15 newest *.log files in the C:\LogFiles directory. Before deletion, older files 
+    Only keeps the latest 15 newest *.log files in the C:\LogFiles directory. Before deletion, older files 
     will be archived into the C:\LogFiles\archive.zip.
     If the archive.zip file already exists, logs will be appended to it.
 
 .EXAMPLE
     Invoke-EZLogRotation -Path C:\LogFiles\*.log -Newest 15 -ArchiveTo C:\LogFiles\archive.zip -OverwriteArchive
 
-    Keep only the latest 15 newest *.log files in the C:\LogFiles directory. Before deletion, older files 
+    Only keeps the latest 15 newest *.log files in the C:\LogFiles directory. Before deletion, older files 
     will be archived into the C:\LogFiles\archive.zip.
     If the archive.zip file already exists it will be overwritten.
 
 .EXAMPLE
     Invoke-EZLogRotation -Path C:\LogFiles\*.log -Interval Daily 
 
-    Keep only the *.log files of the day in the C:\LogFiles directory. Older files will be deleted.
+    Only keeps the *.log files of the day in the C:\LogFiles directory. Older files will be deleted.
     
-.EXAMPLE
-    Invoke-EZLogRotation -Path C:\LogFiles\*.log -Interval Weekly
-
-    Keep only the *.log files of the week in the C:\LogFiles directory. Older files will be deleted.
-
 .EXAMPLE
     Invoke-EZLogRotation -Path C:\LogFiles\*.log -Interval Monthly
 
-    Keep only the *.log files of the month in the C:\LogFiles directory. Older files will be deleted.
+    Only keeps the *.log files of the month in the C:\LogFiles directory. Older files will be deleted.
 
 .EXAMPLE
     Invoke-EZLogRotation -Path C:\LogFiles\*.log -Interval Monthly -ArchiveTo C:\LogFiles\archive.zip -Overwrite
 
-    Keep only the *.log files of the month in the C:\LogFiles directory. Older files will be archived monthly.
+    Only keeps the *.log files of the month in the C:\LogFiles directory. Older files will be archived monthly.
 
 .EXAMPLE
     Invoke-EZLogRotation -Path C:\LogFiles\*.log -Interval Yearly 
 
-    Keep only the *.log files of the current year in the C:\LogFiles directory matching the pattern *.log. Older files will be deleted.
+    Only keeps the *.log files of the current year in the C:\LogFiles directory matching the pattern *.log. Older files will be deleted.
 
 .NOTES
    AUTHOR: Arnaud PETITJEAN
-   LASTEDIT: 2018/03/01
+   LASTEDIT: 2018/04/03
 
 #>
     [cmdletBinding(DefaultParameterSetName="", SupportsShouldProcess=$False)]
@@ -482,12 +475,13 @@ Function Invoke-EZLogRotation
                           $filesToRemove = Get-ChildItem "$Path\$Filter" -Exclude $filesToKeep
                           Break
                         }
-                'Weekly' { $filesToKeep =  Get-ChildItem -Path $Path -Filter $Filter | 
+            <#    'Weekly' { $filesToKeep =  Get-ChildItem -Path $Path -Filter $Filter | 
                                              Where-Object { $_.LastWriteTime -ge (Get-FirstDayOfWeekDate) -and
                                                             $_.LastWriteTime -le (Get-Date) }
                           $filesToRemove = Get-ChildItem "$Path\$Filter" -Exclude $filesToKeep
                           Break
                         }
+            #>
                 'Monthly' { $filesToKeep =  Get-ChildItem -Path $Path -Filter $Filter | 
                                              Where-Object { $_.LastWriteTime -ge (Get-FirstDayOfMonthDate) -and
                                                             $_.LastWriteTime -le (Get-Date) }

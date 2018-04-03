@@ -107,23 +107,24 @@ InModuleScope "EZLog" {
         Context 'Newest parameter' {
 
             BeforeEach {
-                1..50 | Foreach { New-Item -Path "$TestDrive\file_$_.test" -ItemType file
-                                  Start-Sleep -Milliseconds 25 }
+                1..50 | ForEach-Object { New-Item -Path "$TestDrive\file_$_.test" -ItemType file
+                                         Start-Sleep -Milliseconds 25 }
             }
             AfterEach {
                 Get-ChildItem -Path $TestDrive -Filter *.test | Remove-Item
             }
 
-            It 'Only keep the 20 newest files' {
+            It 'should only keep 20 files' {
                 Invoke-EZLogRotation -Path $TestDrive -Filter *.test -Newest 20
-                $condition1 = (Get-ChildItem -Path $TestDrive -Filter *.test).count | Should BeExactly 20
-                
+                (Get-ChildItem -Path $TestDrive -Filter *.test).count | Should BeExactly 20
+            }
+
+            It 'should only keep the newest files' {
+                Invoke-EZLogRotation -Path $TestDrive -Filter *.test -Newest 20
                 # Check if the remaining files are the ones that should really be
-                $arr1 = 31..50 | foreach {"file_$_.test"}
-                $arr2 = Get-ChildItem -Path $TestDrive -Filter *.test | Sort-Object -Property LastWriteTime | Select-Object -ExpandProperty Name
-                $condition2 = (Compare-Object -ReferenceObject $arr1 -DifferenceObject $arr2) -eq $Null
-                
-                $condition1 -and $condition2 | Should Be $true
+                $arr1 = 31..50 | ForEach-Object {"file_$_.test"}
+                $arr2 = Get-ChildItem -Path $TestDrive -Filter file_*.test | Sort-Object -Property LastWriteTime | Select-Object -ExpandProperty Name
+                (Compare-Object -ReferenceObject $arr1 -DifferenceObject $arr2) | Should Be $Null
             }
         } # context
         
@@ -239,7 +240,7 @@ InModuleScope "EZLog" {
         } # Context
     }
 
-    Describe 'Weekly Rotation' -Tag weekly {
+<#    Describe 'Weekly Rotation' -Tag weekly {
         Context 'Rotates the logs on a weekly interval.' {
 
             BeforeEach {
@@ -255,6 +256,7 @@ InModuleScope "EZLog" {
             Mock Get-Date { '2018/01/14 12:00:00' -as [datetime] }
 
             it 'Should left only files created during the week' {
+                $host.EnterNestedPrompt()
                 Invoke-EZLogRotation -Path $TestDrive -Filter *.test -Interval Weekly
                 $DateDayOfWeek = Get-FirstDayOfWeekDate -date (Get-Date)
                 $res = Get-ChildItem -Path $TestDrive -Filter *.test | Where-Object { $_.LastWriteTime -ge $DateDayOfWeek }
@@ -262,7 +264,7 @@ InModuleScope "EZLog" {
             }
         } # Context
     }
-
+#>
 
     Describe 'Get-FirstDayOfWeekDate on countries where Monday is the first day of the week' {
         Context 'Monday' { 
