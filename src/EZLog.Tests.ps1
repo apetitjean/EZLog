@@ -267,6 +267,9 @@ InModuleScope "EZLog" {
 #>
 
     Describe 'Get-FirstDayOfWeekDate on countries where Monday is the first day of the week' {
+
+        Mock Get-FirstDayOfWeek { [dayofweek]::Monday }
+
         Context 'Monday' { 
             It 'Should return Monday of the same day' {
                 $res = Get-FirstDayOfWeekDate -Date (Get-Date -Day 22 -Month 01 -Year 2018)
