@@ -130,8 +130,10 @@ Function Write-EZLog
         $StrTerminator     = "`r`n"       
     }
    
-    $LineNumberLastHeader = Select-String -Pattern '^When generated\s*: (?<date>\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})$' -Path $LogFile -ErrorAction SilentlyContinue | Select-Object -Last 1 | Select-Object -ExpandProperty LineNumber
-    $LineNumberLastFooter = Select-String -Pattern 'Total duration \(minutes\)' -Path $LogFile -ErrorAction SilentlyContinue | Select-Object -Last 1 | Select-Object -ExpandProperty LineNumber
+    if(Test-Path -Path $LogFile -ErrorAction SilentlyContinue) {
+        $LineNumberLastHeader = Select-String -Pattern '^When generated\s*: (?<date>\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})$' -Path $LogFile -ErrorAction SilentlyContinue | Select-Object -Last 1 | Select-Object -ExpandProperty LineNumber
+        $LineNumberLastFooter = Select-String -Pattern 'Total duration \(minutes\)' -Path $LogFile -ErrorAction SilentlyContinue | Select-Object -Last 1 | Select-Object -ExpandProperty LineNumber
+    }
     if(!$LineNumberLastHeader) {
         $LineNumberLastHeader = 3
     }
@@ -150,7 +152,7 @@ Function Write-EZLog
             $Message = $CustomHeaderMessage
             $Message += "{0}"
           } else {
-            if($LineNumberLastFooter -lt $LineNumberLastHeader) {
+            if($LineNumberLastFooter -lt $LineNumberLastHeader -and $LineNumberLastFooter -ne 0) {
                 throw "Cannot insert the header twice. Please close the session with a footer first"
             }
             $Message =  "+----------------------------------------------------------------------------------------+{0}"
