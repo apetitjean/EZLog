@@ -86,9 +86,15 @@ Function Write-EZLog
        
         [parameter(Mandatory=$true, ParameterSetName="set1", ValueFromPipeline=$false)]
         [Switch]$Header,
+
+        [parameter(Mandatory=$false, ParameterSetName="set1", ValueFromPipeline=$false)]
+        [String]$CustomHeaderMessage,
        
         [parameter(Mandatory=$true, ParameterSetName="set3", ValueFromPipeline=$false)]
         [Switch]$Footer,
+
+        [parameter(Mandatory=$false, ParameterSetName="set3", ValueFromPipeline=$False)]
+        [String]$CustomFooterMessage,
 
         [parameter(Mandatory=$true, ValueFromPipeline=$false)]
         [String]$LogFile,
@@ -97,7 +103,10 @@ Function Write-EZLog
         [Char]$Delimiter = $( if ((Get-Culture).TextInfo.ListSeparator -eq ' ')  {','} else {(Get-Culture).TextInfo.ListSeparator}), 
 
         [parameter(Mandatory=$false, ValueFromPipeline=$false)]
-        [Switch]$ToScreen=$false
+        [Switch]$ToScreen=$false,
+
+        [parameter(Mandatory=$false, ValueFromPipeline=$false)]
+        [Switch]$Append=$false
     )
    
     $Color = 'Cyan'
@@ -121,24 +130,51 @@ Function Write-EZLog
         $StrTerminator     = "`r`n"       
     }
    
+    $LineNumberLastHeader = Select-String -Pattern '^When generated\s*: (?<date>\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})$' -Path $LogFile -ErrorAction SilentlyContinue | Select-Object -Last 1 | Select-Object -ExpandProperty LineNumber
+    $LineNumberLastFooter = Select-String -Pattern 'Total duration \(minutes\)' -Path $LogFile -ErrorAction SilentlyContinue | Select-Object -Last 1 | Select-Object -ExpandProperty LineNumber
+    if(!$LineNumberLastHeader) {
+        $LineNumberLastHeader = 3
+    }
+    if(!$LineNumberLastFooter) {
+        $LineNumberLastFooter = 0
+    } else {
+        $LineNumberLastFooter = $LineNumberLastFooter[0]
+    }
+    
     Switch ($PsCmdlet.ParameterSetName)
     {
        "set1" # Header
        {
-          $Message =  "+----------------------------------------------------------------------------------------+{0}"
-          $Message += "Script fullname          : $currentScriptName{0}"
-          $Message += "When generated           : $StartDate_str{0}"
-          $Message += "Current user             : $currentUser{0}"
-          $Message += "Current computer         : $currentComputer{0}"
-          $Message += "Operating System         : $OSName{0}"
-          $Message += "OS Architecture          : $OSArchi{0}"
-          $Message += "+----------------------------------------------------------------------------------------+{0}"
-          $Message += "{0}"
+          
+          if ($CustomHeaderMessage) {
+            $Message = $CustomHeaderMessage
+            $Message += "{0}"
+          } else {
+            if($LineNumberLastFooter -lt $LineNumberLastHeader) {
+                throw "Cannot insert the header twice. Please close the session with a footer first"
+            }
+            $Message =  "+----------------------------------------------------------------------------------------+{0}"
+            $Message += "Script fullname          : $currentScriptName{0}"
+            $Message += "When generated           : $StartDate_str{0}"
+            $Message += "Current user             : $currentUser{0}"
+            $Message += "Current computer         : $currentComputer{0}"
+            $Message += "Operating System         : $OSName{0}"
+            $Message += "OS Architecture          : $OSArchi{0}"
+            $Message += "+----------------------------------------------------------------------------------------+{0}"
+            $Message += "{0}"
+          }
 
           $Message = $Message -f $StrTerminator
           # Log file creation
-          [VOID] (New-Item -ItemType File -Path $LogFile -Force)
-          Add-Content -Path $LogFile -Value $Message -NoNewline
+          if(!$Append) {
+            [VOID] (New-Item -ItemType File -Path $LogFile -Force)
+          } 
+          if (Test-Path -Path $LogFile -ErrorAction SilentlyContinue) {
+            Add-Content -Path $LogFile -Value $Message -NoNewline
+          } else {
+            [VOID] (New-Item -ItemType File -Path $LogFile -Force)
+          }
+          
           break
        }
 
@@ -159,25 +195,29 @@ Function Write-EZLog
        "set3" # Footer
        {
           # Extracting start date from the file header
-          [VOID]( (Get-Content $LogFile -TotalCount 3)[-1] -match '^When generated\s*: (?<date>\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})$' )
-          if ($Matches.date -eq $null)
-          {
-             throw "Cannot get the start date from the header. Please check if the file header is correctly formatted."
+          if($CustomFooterMessage) {
+            $Message = $CustomFooterMessage
+          } else {
+            
+            [VOID]( (Get-Content $LogFile -TotalCount $LineNumberLastHeader)[-1] -match '^When generated\s*: (?<date>\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})$' )
+            if ($Matches.date -eq $null -or ($LineNumberLastHeader -lt $LineNumberLastFooter -and $LineNumberLastFooter -ne 0))
+            {
+               throw "Cannot get the start date from the header. Please check if the file header is correctly formatted or the footer was inserted twice. If used a custom header message, you also have to use a custom footer message."
+            }
+            $StartDate   = [DateTime]$Matches.date
+            $EndDate     = Get-Date
+            $EndDate_str = Get-Date $EndDate -UFormat "%Y-%m-%d %H:%M:%S"
+  
+            $duration_TotalSeconds = [int](New-TimeSpan -Start $StartDate -End $EndDate | Select-Object -ExpandProperty TotalSeconds)
+            $duration_TotalMinutes = (New-TimeSpan -Start $StartDate -End $EndDate | Select-Object -ExpandProperty TotalMinutes)
+            $duration_TotalMinutes = [MATH]::Round($duration_TotalMinutes, 2)
+            $Message = "{0}"
+            $Message += "+----------------------------------------------------------------------------------------+{0}"
+            $Message += "End time                 : $EndDate_str{0}"
+            $Message += "Total duration (seconds) : $duration_TotalSeconds{0}"
+            $Message += "Total duration (minutes) : $duration_TotalMinutes{0}"
+            $Message += "+----------------------------------------------------------------------------------------+{0}"
           }
-          $StartDate   = [DateTime]$Matches.date
-          $EndDate     = Get-Date
-          $EndDate_str = Get-Date $EndDate -UFormat "%Y-%m-%d %H:%M:%S"
-
-          $duration_TotalSeconds = [int](New-TimeSpan -Start $StartDate -End $EndDate | Select-Object -ExpandProperty TotalSeconds)
-          $duration_TotalMinutes = (New-TimeSpan -Start $StartDate -End $EndDate | Select-Object -ExpandProperty TotalMinutes)
-          $duration_TotalMinutes = [MATH]::Round($duration_TotalMinutes, 2)
-
-          $Message = "{0}"
-          $Message += "+----------------------------------------------------------------------------------------+{0}"
-          $Message += "End time                 : $EndDate_str{0}"
-          $Message += "Total duration (seconds) : $duration_TotalSeconds{0}"
-          $Message += "Total duration (minutes) : $duration_TotalMinutes{0}"
-          $Message += "+----------------------------------------------------------------------------------------+{0}"
           
           $Message = $Message -f $StrTerminator
 
