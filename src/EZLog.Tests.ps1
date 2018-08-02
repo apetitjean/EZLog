@@ -43,6 +43,16 @@ InModuleScope "EZLog" {
                     Write-EZLog -Footer
                     Get-Content $logfile -Tail 1 | Should BeLike '+-*-+'
                 }
+
+                It "Appends with a custom header into the log file." {
+                    Write-EZLog -Header -CustomHeaderMessage "This is a custom header"
+                    Get-Content $logfile -Tail 1 | Should Be "This is a custom header"
+                }
+
+                It "Writes the footer with a custom footer in it." {
+                    Write-EZLog -Footer -CustomFooterMessage "This is a custom Footer"
+                    Get-Content $logfile -Tail 1 | Should be "This is a custom Footer"
+                }
              
             } # Context "separator validation"
         }
