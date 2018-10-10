@@ -97,7 +97,7 @@ Function Write-EZLog
         [Char]$Delimiter = $( if ((Get-Culture).TextInfo.ListSeparator -eq ' ')  {','} else {(Get-Culture).TextInfo.ListSeparator}), 
 
         [parameter(Mandatory=$false, ValueFromPipeline=$false)]
-        [Switch]$ToScreen=$false
+        [Switch]$ToScreen
     )
    
     $Color = 'Cyan'
