@@ -232,5 +232,4 @@ If the archive.zip file already exists, logs will be appended to it.
 ## Prerequisites
 
 Windows PowerShell v5+  
-PowerShell Core v6+  
-Well formated Brain ;-)
+PowerShell Core v6+
