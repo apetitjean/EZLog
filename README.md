@@ -1,7 +1,7 @@
 [![Build status](https://ci.appveyor.com/api/projects/status/uk66ctiqlf8ntpb2?svg=true)](https://ci.appveyor.com/project/apetitjean/ezlog)
 
 # EZLog
-## A very easy and pragmatic PowerShell log module for admins in a hurry.  
+## A very easy and pragmatic PowerShell log module for admins in a hurry...  
 
 The EZLog module is a **lightweight** set of functions aimed at providing **nice looking and professional log files**.
 But wait! There's no need to recall multiple commands, everything is done with only one command : `Write-EZLog`.  
