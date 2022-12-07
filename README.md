@@ -159,7 +159,7 @@ This way you will get a nice footer on your log file and you also get the total 
    `ConvertFrom-EZLog` combined with `ConvertTo-Json` could also be very useful.
 
 ```PowerShell
-   PS > ConvertFrom-EZLog -Filepath C:\temp\logfile.log | ConverTo-Json
+   PS > ConvertFrom-EZLog -Filepath C:\temp\logfile.log | ConvertTo-Json
    {
     "Events":  [
                    {
