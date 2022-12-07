@@ -12,7 +12,7 @@
 RootModule = 'EZLog.psm1'
 
 # Version number of this module.
-ModuleVersion = '2.1.1'
+ModuleVersion = '2.2.0'
 
 # ID used to uniquely identify this module
 GUID = '9f9d9559-2f69-4e46-83c8-c7ab739e745b'
@@ -24,7 +24,7 @@ Author = 'Arnaud PETITJEAN'
 CompanyName = 'PowerShell-Scripting.com'
 
 # Copyright statement for this module
-Copyright = '(c) 2018 Arnaud PETITJEAN. All rights reserved.'
+Copyright = '(c) 2022 Arnaud PETITJEAN. All rights reserved.'
 
 # Description of the functionality provided by this module
 Description = 'A very easy and pragmatic log module for admins in a hurry. See project site on Github for more info.'
