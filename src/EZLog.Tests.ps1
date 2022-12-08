@@ -81,13 +81,13 @@ InModuleScope "EZLog" {
                     $objLog.keys.count | Should Be 3
                 }
 
-                $objLog.Header.psbase.keys | foreach { 
+                $objLog.Header.psbase.keys | ForEach-Object { 
                     It "Header : property '$_' is not null " {
                         $objLog.Header.$_ | Should Not BeNullOrEmpty
                     }
                 }
 
-                $objLog.Footer.psbase.keys | foreach { 
+                $objLog.Footer.psbase.keys | ForEach-Object { 
                     It "Footer : property '$_' is not null " {
                         $objLog.Footer.$_ | Should Not BeNullOrEmpty
                     }
@@ -131,7 +131,7 @@ InModuleScope "EZLog" {
         Context 'Newest parameter combined with ArchiveTo parameter (no existing archive file)' {
 
             BeforeEach {
-                1..50 | Foreach { New-Item -Path "$TestDrive\file_$_.test" -ItemType file
+                1..50 | Foreach-Object { New-Item -Path "$TestDrive\file_$_.test" -ItemType file
                                   Start-Sleep -Milliseconds 25 }
             }
             AfterEach {
@@ -155,14 +155,14 @@ InModuleScope "EZLog" {
 
             BeforeEach {
                 # Archive creation. The goal is to check that the files are appended to it.
-                101..150 | Foreach { New-Item -Path "$TestDrive\file_$_.test" -ItemType file
+                101..150 | ForEach-Object { New-Item -Path "$TestDrive\file_$_.test" -ItemType file
                                   Start-Sleep -Milliseconds 25 }
                 $archivePath = "$TestDrive\Archive.zip"
                 # 1st log rotation. We just keep the 15 newest files. 35 files should be archived.
                 Invoke-EZLogRotation -Path $TestDrive -Filter *.test -Newest 15 -ArchiveTo $archivePath
                 
                 # Adding 50 more files
-                1..50 | Foreach { New-Item -Path "$TestDrive\file_$_.test" -ItemType file
+                1..50 | ForEach-Object { New-Item -Path "$TestDrive\file_$_.test" -ItemType file
                                   Start-Sleep -Milliseconds 25 }
             }
 
@@ -184,13 +184,13 @@ InModuleScope "EZLog" {
             BeforeEach {
                 
                 # Archive creation in order to check if it's overwrited as it should.
-                101..150 | Foreach { New-Item -Path "$TestDrive\file_$_.test" -ItemType file
+                101..150 | ForEach-Object { New-Item -Path "$TestDrive\file_$_.test" -ItemType file
                                   Start-Sleep -Milliseconds 25 }
                 $archivePath = "$TestDrive\Archive.zip"
                 Invoke-EZLogRotation -Path $TestDrive -Filter *.test -Newest 15 -ArchiveTo $archivePath
                 
                 # Creating 50 additionnal files
-                1..50 | Foreach { New-Item -Path "$TestDrive\file_$_.test" -ItemType file
+                1..50 | ForEach-Object { New-Item -Path "$TestDrive\file_$_.test" -ItemType file
                                   Start-Sleep -Milliseconds 25 }
             }
 
@@ -210,9 +210,9 @@ InModuleScope "EZLog" {
         Context 'Rotates the logs on a daily interval.' {
 
             BeforeEach {
-                1..72 | Foreach { New-Item -Path "$TestDrive\file_$_.test" -ItemType file}
+                1..72 | Foreach-Object { New-Item -Path "$TestDrive\file_$_.test" -ItemType file}
                 $date = '2018/01/15 12:00:00' -as [datetime]
-                Get-ChildItem $TestDrive\*.test | Sort-Object -Property LastWriteTime | foreach {$i=0} {$_.LastWriteTime = $date.AddHours(-$i); $i++}
+                Get-ChildItem $TestDrive\*.test | Sort-Object -Property LastWriteTime | Foreach-Object {$i=0} {$_.LastWriteTime = $date.AddHours(-$i); $i++}
             }
 
             AfterEach {
@@ -244,9 +244,9 @@ InModuleScope "EZLog" {
         Context 'Rotates the logs on a weekly interval.' {
 
             BeforeEach {
-                1..500 | Foreach { New-Item -Path "$TestDrive\file_$_.test" -ItemType file }
+                1..500 | Foreach-Object { New-Item -Path "$TestDrive\file_$_.test" -ItemType file }
                 $date = '2018/01/15 12:00:00' -as [datetime]
-                Get-ChildItem $TestDrive\*.test | Sort-Object -Property LastWriteTime | foreach {$i=0} {$_.LastWriteTime = $date.AddHours(-$i); $i++}
+                Get-ChildItem $TestDrive\*.test | Sort-Object -Property LastWriteTime | Foreach-Object {$i=0} {$_.LastWriteTime = $date.AddHours(-$i); $i++}
             }
 
             AfterEach {
@@ -378,9 +378,9 @@ InModuleScope "EZLog" {
         Context 'Rotates the logs on a monthly interval.' {
 
             BeforeEach {
-                1..500 | Foreach { New-Item -Path "$TestDrive\file_$_.test" -ItemType file }
+                1..500 | Foreach-Object { New-Item -Path "$TestDrive\file_$_.test" -ItemType file }
                 $date = '2018/01/15 12:00:00' -as [datetime]
-                Get-ChildItem $TestDrive\*.test | Sort-Object -Property LastWriteTime | foreach {$i=0} {$_.LastWriteTime = $date.AddHours(-$i); $i++}
+                Get-ChildItem $TestDrive\*.test | Sort-Object -Property LastWriteTime | Foreach-Object {$i=0} {$_.LastWriteTime = $date.AddHours(-$i); $i++}
             }
 
             AfterEach {
@@ -411,9 +411,9 @@ InModuleScope "EZLog" {
         Context 'Rotates the logs on a yearly interval.' {
 
             BeforeEach {
-                1..500 | Foreach { New-Item -Path "$TestDrive\file_$_.test" -ItemType file }
+                1..500 | Foreach-Object { New-Item -Path "$TestDrive\file_$_.test" -ItemType file }
                 $date = '2019/01/01 00:00:00' -as [datetime]
-                Get-ChildItem $TestDrive\*.test | Sort-Object -Property LastWriteTime | foreach {$i=1} {$_.LastWriteTime = $date.AddDays(-$i); $i++}
+                Get-ChildItem $TestDrive\*.test | Sort-Object -Property LastWriteTime | Foreach-Object {$i=1} {$_.LastWriteTime = $date.AddDays(-$i); $i++}
             }
 
             AfterEach {
