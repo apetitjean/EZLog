@@ -133,7 +133,7 @@ Accept wildcard characters: False
 ```
 
 ### -LogFile
-{{ Fill LogFile Description }}
+Path to the log file to be created.
 
 ```yaml
 Type: String
@@ -148,7 +148,7 @@ Accept wildcard characters: False
 ```
 
 ### -Delimiter
-{{ Fill Delimiter Description }}
+Specify a delimiter to be used in order to separate the fields in a log entry. 
 
 ```yaml
 Type: Char
@@ -163,7 +163,7 @@ Accept wildcard characters: False
 ```
 
 ### -ToScreen
-{{ Fill ToScreen Description }}
+Displays the logs in the log file and in the console.
 
 ```yaml
 Type: SwitchParameter
@@ -186,6 +186,6 @@ This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable
 
 ## NOTES
 AUTHOR: Arnaud PETITJEAN - arnaud@powershell-scripting.com
-LASTEDIT: 2018/03/30
+LASTEDIT: 2023/04/27
 
 ## RELATED LINKS

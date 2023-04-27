@@ -406,7 +406,7 @@
         <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
           <maml:name>LogFile</maml:name>
           <maml:description>
-            <maml:para>{{ Fill LogFile Description }}</maml:para>
+            <maml:para>Path to the log file to be created.</maml:para>
           </maml:description>
           <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
           <dev:type>
@@ -418,7 +418,7 @@
         <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
           <maml:name>Delimiter</maml:name>
           <maml:description>
-            <maml:para>{{ Fill Delimiter Description }}</maml:para>
+            <maml:para>Specify a delimiter to be used in order to separate the fields in a log entry.</maml:para>
           </maml:description>
           <command:parameterValue required="true" variableLength="false">Char</command:parameterValue>
           <dev:type>
@@ -430,7 +430,7 @@
         <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
           <maml:name>ToScreen</maml:name>
           <maml:description>
-            <maml:para>{{ Fill ToScreen Description }}</maml:para>
+            <maml:para>Displays the logs in the log file and in the console.</maml:para>
           </maml:description>
           <dev:type>
             <maml:name>SwitchParameter</maml:name>
@@ -455,7 +455,7 @@
         <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
           <maml:name>LogFile</maml:name>
           <maml:description>
-            <maml:para>{{ Fill LogFile Description }}</maml:para>
+            <maml:para>Path to the log file to be created.</maml:para>
           </maml:description>
           <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
           <dev:type>
@@ -467,7 +467,7 @@
         <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
           <maml:name>Delimiter</maml:name>
           <maml:description>
-            <maml:para>{{ Fill Delimiter Description }}</maml:para>
+            <maml:para>Specify a delimiter to be used in order to separate the fields in a log entry.</maml:para>
           </maml:description>
           <command:parameterValue required="true" variableLength="false">Char</command:parameterValue>
           <dev:type>
@@ -479,7 +479,7 @@
         <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
           <maml:name>ToScreen</maml:name>
           <maml:description>
-            <maml:para>{{ Fill ToScreen Description }}</maml:para>
+            <maml:para>Displays the logs in the log file and in the console.</maml:para>
           </maml:description>
           <dev:type>
             <maml:name>SwitchParameter</maml:name>
@@ -504,7 +504,7 @@
         <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
           <maml:name>LogFile</maml:name>
           <maml:description>
-            <maml:para>{{ Fill LogFile Description }}</maml:para>
+            <maml:para>Path to the log file to be created.</maml:para>
           </maml:description>
           <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
           <dev:type>
@@ -516,7 +516,7 @@
         <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
           <maml:name>Delimiter</maml:name>
           <maml:description>
-            <maml:para>{{ Fill Delimiter Description }}</maml:para>
+            <maml:para>Specify a delimiter to be used in order to separate the fields in a log entry.</maml:para>
           </maml:description>
           <command:parameterValue required="true" variableLength="false">Char</command:parameterValue>
           <dev:type>
@@ -528,7 +528,7 @@
         <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
           <maml:name>ToScreen</maml:name>
           <maml:description>
-            <maml:para>{{ Fill ToScreen Description }}</maml:para>
+            <maml:para>Displays the logs in the log file and in the console.</maml:para>
           </maml:description>
           <dev:type>
             <maml:name>SwitchParameter</maml:name>
@@ -590,7 +590,7 @@
       <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
         <maml:name>LogFile</maml:name>
         <maml:description>
-          <maml:para>{{ Fill LogFile Description }}</maml:para>
+          <maml:para>Path to the log file to be created.</maml:para>
         </maml:description>
         <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
         <dev:type>
@@ -602,7 +602,7 @@
       <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
         <maml:name>Delimiter</maml:name>
         <maml:description>
-          <maml:para>{{ Fill Delimiter Description }}</maml:para>
+          <maml:para>Specify a delimiter to be used in order to separate the fields in a log entry.</maml:para>
         </maml:description>
         <command:parameterValue required="true" variableLength="false">Char</command:parameterValue>
         <dev:type>
@@ -614,7 +614,7 @@
       <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
         <maml:name>ToScreen</maml:name>
         <maml:description>
-          <maml:para>{{ Fill ToScreen Description }}</maml:para>
+          <maml:para>Displays the logs in the log file and in the console.</maml:para>
         </maml:description>
         <command:parameterValue required="false" variableLength="false">SwitchParameter</command:parameterValue>
         <dev:type>
@@ -628,7 +628,7 @@
     <command:returnValues />
     <maml:alertSet>
       <maml:alert>
-        <maml:para>AUTHOR: Arnaud PETITJEAN - arnaud@powershell-scripting.com LASTEDIT: 2018/03/30</maml:para>
+        <maml:para>AUTHOR: Arnaud PETITJEAN - arnaud@powershell-scripting.com LASTEDIT: 2023/04/27</maml:para>
       </maml:alert>
     </maml:alertSet>
     <command:examples>
