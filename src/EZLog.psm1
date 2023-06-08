@@ -105,7 +105,7 @@ Function Write-EZLog
        {
           # Extracting start date from the file header
           [VOID]( (Get-Content $LogFile -TotalCount 3)[-1] -match '^When generated\s*: (?<date>\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})$' )
-          if ($Matches.date -eq $null)
+          if ($null -eq $Matches.date)
           {
              throw "Cannot get the start date from the header. Please check if the file header is correctly formatted."
           }
