@@ -81,7 +81,7 @@ Function Write-EZLog
           $Message += "{0}"
 
           $Message = $Message -f $StrTerminator
-          # Log file creation
+          # Log file creation.
           [VOID] (New-Item -ItemType File -Path $LogFile -Force)
           Add-Content -Path $LogFile -Value $Message -NoNewline
           break
