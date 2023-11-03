@@ -229,8 +229,9 @@ Function ConvertFrom-EZlog
                                                $matches.Value
                                             }
                                           )
-    
+
         $footer = Get-Content -Path $FilePath | Select-Object -Skip 1  -Last 3
+
         $result.Footer.EndTime         = $( $null = $footer[0] -match '(?<Name>.+?)(:\s{1})(?<Value>.+)?'
                                             if ($matches) 
                                             {
@@ -242,16 +243,27 @@ Function ConvertFrom-EZlog
 
 
 
-        $LogMessages = Get-Log -file $FilePath  
+        $LogMessages = Get-Log -file $FilePath
         $separator   = $LogMessages[0][19]
         foreach ($log in $LogMessages)
         {
-            $res = $log -split $separator
-            $result.Events += [PSCustomObject]@{
-                                    Date     = $res[0] -as [DateTime]
-                                    Category = $res[1].Trim()
-                                    Message  = $res[2].Trim()
-                                }
+            #Handling of log messages with newline characters.
+
+            #Check that the log line starts with a date time in expected format (%Y-%m-%d %H:%M:%S) and with one message category value.
+            if($log -imatch "\d{4}-(0[1-9]|1[0-2])-\d{2} \d{2}:\d{2}:\d{2}$($separator)\s*($([MsgCategory]::GetNames([MsgCategory]) -join "|"))$($separator)\s*")
+            {
+                $res = $log -split $separator
+                $result.Events += [PSCustomObject]@{
+                                        Date     = $res[0] -as [DateTime]
+                                        Category = $res[1].Trim()
+                                        Message  = $res[2].Trim()
+                                    }    
+            }
+            elseif($result.Events.Count -gt 0)
+            {
+                #Otherwise, append the line to the previous event message.
+                $result.Events[$result.Events.Count - 1].Message += $log
+            }
         }
     }
 
