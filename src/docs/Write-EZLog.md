@@ -33,39 +33,49 @@ This cmdlet allows to write timestamped and nice formatted logs with a header an
 It also allows to specify if the log entry being written is an info, a warning or an error.
 
 The header contains the following information :
-    - full script path of the caller, 
-    - account under the script was run,
-    - computer name of the machine whose executed the script,
-    - and more...
+- full script path of the caller, 
+- account under the script was run,
+- computer name of the machine whose executed the script,
+- and more...
+
 The footer contains the elapsed time from the beginning of the log session.
 
 ## EXAMPLES
 
 ### EXAMPLE 1
-```
-First thing to do is write a header and define a log file where the data will be written.
-```
+
+```PowerShell
+# First thing to do is write a header and define a log file where the data will be written to.
 
 Write-EZLog -Header -LogFile C:\logs\mylogfile.log
+```
 
-Next, anywhere in your script when you need to write a log, do one of the folowing command:
+### EXAMPLE 2
+
+```PowerShell
+# Next, anywhere in your script when you need to write a log, do one of the folowing command:
 
 Write-EZLog -Category INF -Message 'This is an info to be written in the log file'
 Write-EZLog -Category WAR -Message 'This is a warning to be written in the log file'
 Write-EZLog -Category ERR -Message 'This is an error to be written in the log file'
+```
 
-Finaly, to close your logfile you need to write a footer, just do that:
+### EXAMPLE 3
+
+```PowerShell
+# Finaly, to close your logfile you need to write a footer, just do that:
 
 Write-EZLog -Footer
+```
 
-### EXAMPLE 2
-```
-If you want to see the logs in the PowerShell console whereas they are still written to disk, 
-you can specify the -ToScreen switch.
-Info entries will be written in cyan color, Yellow for warnings, and Red for the errors.
-```
+### EXAMPLE 4
+
+```PowerShell
+# If you want to see the logs in the PowerShell console whereas they are still written to disk, you can specify the -ToScreen switch.
+# Info entries will be written in cyan color, Yellow for warnings, and Red for the errors.
 
 Write-EZLog -Category WAR -Message 'This is a warning to be written in the log file' -ToScreen
+```
 
 ## PARAMETERS
 
@@ -178,14 +188,15 @@ Accept wildcard characters: False
 ```
 
 ### CommonParameters
-This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable. For more information, see [about_CommonParameters](http://go.microsoft.com/fwlink/?LinkID=113216).
+This cmdlet supports the common parameters: Debug, ErrorAction, ErrorVariable, InformationAction, InformationVariable, OutVariable, OutBuffer, PipelineVariable, Verbose, WarningAction, and WarningVariable. For more information, see [about_CommonParameters](http://go.microsoft.com/fwlink/?LinkID=113216).
 
 ## INPUTS
 
 ## OUTPUTS
 
 ## NOTES
-AUTHOR: Arnaud PETITJEAN - arnaud@powershell-scripting.com
-LASTEDIT: 2023/04/27
+AUTHOR: Arnaud PETITJEAN - apetitjean@start-scripting.io
+LASTEDIT: 2023/11/30
 
 ## RELATED LINKS
+[See my Github repository](https://github.com/apetitjean/EZLog)
