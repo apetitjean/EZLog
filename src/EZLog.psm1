@@ -84,6 +84,7 @@ Function Write-EZLog
           # Log file creation.
           [VOID] (New-Item -ItemType File -Path $LogFile -Force)
           Add-Content -Path $LogFile -Value $Message -NoNewline
+          
           break
        }
 
