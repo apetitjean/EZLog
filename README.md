@@ -11,7 +11,7 @@ That said, you also have these utility commands at your disposal:
 - `ConvertFrom-EZLog` : convert a log file into an object. This could be very useful to parse logs in a directory or to convert a raw log file into a JSON file.
 - `Invoke-EZLogRotation` : provide log rotation. You can trim the logs based on a number of files to keep or on a regular basis (daily, weekly, monthly or yearly).
 
-**Note:** `Invoke-EZLogRotation` can also be used with whatever log files, it's not limited to rotate logs that have been created with this module.
+**Note:** `Invoke-EZLogRotation` can be used with any log files; it is not limited to rotating logs created by this module.
 
 EZLog allows to write timestamped and nice formatted logs with a header and footer.
 It also allows to specify if the log entry being written is an info, a warning or an error.
