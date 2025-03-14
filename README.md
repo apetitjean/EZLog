@@ -7,7 +7,7 @@ The EZLog module is a **lightweight** set of functions aimed at providing **nice
 But wait! There's no need to recall multiple commands, everything is done with only one command : `Write-EZLog`.  
 So anywhere in a script you need to write a log on disk or/and to display an information on your screen, all you need to do is just to call `Write-EZLog` along with your message.
 
-That said, you also have these utility commands at your disposal:
+That being said, you also have access to the following utility commands:
 - `ConvertFrom-EZLog` : convert a log file into an object. This could be very useful to parse logs in a directory or to convert a raw log file into a JSON file.
 - `Invoke-EZLogRotation` : provide log rotation. You can trim the logs based on a number of files to keep or on a regular basis (daily, weekly, monthly or yearly).
 
