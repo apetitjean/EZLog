@@ -311,25 +311,25 @@ Function Invoke-EZLogRotation
                                              Where-Object { $_.LastWriteTime.Year  -eq (Get-Date).Year -and 
                                                             $_.LastWriteTime.Month -eq (Get-Date).Month -and
                                                             $_.LastWriteTime.Day   -eq (Get-Date).Day }
-                          $filesToRemove = Get-ChildItem "$Path\$Filter" -Exclude $filesToKeep
+                          $filesToRemove = Get-ChildItem "$Path\$Filter" -Exclude $filesToKeep.Name
                           Break
                         }
             <#    'Weekly' { $filesToKeep =  Get-ChildItem -Path $Path -Filter $Filter | 
                                              Where-Object { $_.LastWriteTime -ge (Get-FirstDayOfWeekDate) -and
                                                             $_.LastWriteTime -le (Get-Date) }
-                          $filesToRemove = Get-ChildItem "$Path\$Filter" -Exclude $filesToKeep
+                          $filesToRemove = Get-ChildItem "$Path\$Filter" -Exclude $filesToKeep.Name
                           Break
                         }
             #>
                 'Monthly' { $filesToKeep =  Get-ChildItem -Path $Path -Filter $Filter | 
                                              Where-Object { $_.LastWriteTime -ge (Get-FirstDayOfMonthDate) -and
                                                             $_.LastWriteTime -le (Get-Date) }
-                          $filesToRemove = Get-ChildItem "$Path\$Filter" -Exclude $filesToKeep
+                          $filesToRemove = Get-ChildItem "$Path\$Filter" -Exclude $filesToKeep.Name
                           Break
                         }
                 'Yearly' { $filesToKeep =  Get-ChildItem -Path $Path -Filter $Filter | 
                                              Where-Object { $_.LastWriteTime.Year -eq (Get-Date).Year }
-                          $filesToRemove = Get-ChildItem "$Path\$Filter" -Exclude $filesToKeep
+                          $filesToRemove = Get-ChildItem "$Path\$Filter" -Exclude $filesToKeep.Name
                           Break
                         }                        
             }
