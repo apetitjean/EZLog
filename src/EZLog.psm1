@@ -1,6 +1,6 @@
 #Requires -Version 5.1
 $ErrorActionPreference = 'Stop'
-Set-PSDebug -Strict
+Set-StrictMode -Version 2
 
 Add-Type -TypeDefinition @"
     public enum MsgCategory
