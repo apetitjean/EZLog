@@ -230,7 +230,7 @@ InModuleScope "EZLog" {
             
             It 'The Day property of the remaining files should be unique' {
                 Invoke-EZLogRotation -Path $TestDrive -Filter *.test -Interval Daily
-                (Get-ChildItem -Path $TestDrive -Filter *.test | Select-Object -ExpandProperty LastWriteTime | Select -ExpandProperty day -Unique).count | Should BeExactly 1
+                @(Get-ChildItem -Path $TestDrive -Filter *.test | Select-Object -ExpandProperty LastWriteTime | Select -ExpandProperty day -Unique).count | Should BeExactly 1
             }
 
             It 'The Day property of the remaining files should be 14' {
